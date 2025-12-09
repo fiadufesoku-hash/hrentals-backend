@@ -1,14 +1,15 @@
 {
   "name": "ho-rentals-backend",
   "version": "1.0.0",
+  "private":"true",
   "type": "module",
   "main": "src/server.js",
-  "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "build": "prisma generate",
-    "db:push": "prisma db push"
-  },
+"scripts": {
+  "dev": "nodemon src/server.js",
+  "start": "node src/server.js",
+  "build": "prisma generate --schema=src/prisma/schema.prisma",
+  "db:push": "prisma db push --schema=src/prisma/schema.prisma"
+},
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "apollo-server-express": "^3.13.0",

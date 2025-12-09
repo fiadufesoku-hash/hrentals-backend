@@ -11,7 +11,7 @@ import resolvers from "./graphql/resolvers.js";
 import { handleCollectionCallback } from "./services/momoService.js";
 import { upload } from "./services/uploadService.js";
 
-dotenv.config();
+dotenv.config({ path: './src/.env' })
 
 // ---------------- DATABASE ----------------
 // Use Railway DB if USE_RAILWAY is true
