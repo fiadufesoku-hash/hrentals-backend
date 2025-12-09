@@ -1,0 +1,162 @@
+import express from 'express';
+import { ApolloServer } from 'apollo-server-express';
+import jwt from 'jsonwebtoken';
+import multer from 'multer';
+import path from 'path';
+import cors from "cors";
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import { typeDefs } from './graphql/schema.js';
+import resolvers from './graphql/resolvers.js';
+import { JWT_SECRET, PORT } from './config/env.js';
+import { handleCollectionCallback } from './services/momoService.js';
+
+// ✅ Get directory name in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ✅ CONFIGURE MULTER FOR FILE UPLOADS
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadsDir = path.join(__dirname, 'uploads');
+    // Create uploads directory if it doesn't exist
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    // Create unique filename with timestamp
+    const uniqueName = `${Date.now()}_${file.originalname}`;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+  console.log('🔍 DEBUG: File upload attempt');
+  console.log('   Field name:', file.fieldname);
+  console.log('   Original name:', file.originalname);
+  console.log('   MIME type:', file.mimetype);
+  console.log('   MIME type starts with image/:', file.mimetype.startsWith('image/'));
+  
+  // Log ALL headers for debugging
+  console.log('   Request headers:', req.headers['content-type']);
+  
+  if (file.mimetype.startsWith('image/')) {
+    console.log('✅ Accepting file as image');
+    cb(null, true);
+  } else {
+    console.log('❌ Rejecting - MIME type is not image/*');
+    console.log('   Try adding ;type=image/png to curl command');
+    cb(new Error('Only image files are allowed!'), false);
+  }
+}
+});
+
+async function start() {
+    const app = express();
+    // CORS FIX
+app.use(cors({
+    origin: "*", 
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.use(express.json());
+    app.use(express.json()); 
+
+    // ✅ SERVE UPLOADED FILES STATICALLY
+    app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+    // ✅ ADD FILE UPLOAD ROUTE (REST API)
+    app.post('/api/upload', upload.single('image'), (req, res) => {
+      try {
+        if (!req.file) {
+          return res.status(400).json({ error: 'No file uploaded' });
+        }
+        
+        // Generate URL for the uploaded file
+        const imageUrl = `http://localhost:${PORT}/uploads/${req.file.filename}`;
+        console.log('✅ Image uploaded:', imageUrl);
+        
+        res.json({ 
+          success: true, 
+          imageUrl,
+          filename: req.file.filename 
+        });
+      } catch (error) {
+        console.error('❌ Upload error:', error);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // ✅ ADD MULTIPLE FILE UPLOAD ROUTE
+    app.post('/api/upload-multiple', upload.array('images', 10), (req, res) => {
+      try {
+        if (!req.files || req.files.length === 0) {
+          return res.status(400).json({ error: 'No files uploaded' });
+        }
+        
+        const imageUrls = req.files.map(file => 
+          `http://localhost:${PORT}/uploads/${file.filename}`
+        );
+        
+        console.log('✅ Multiple images uploaded:', imageUrls);
+        
+        res.json({ 
+          success: true, 
+          imageUrls,
+          count: req.files.length 
+        });
+      } catch (error) {
+        console.error('❌ Upload error:', error);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Your existing routes
+    app.get('/health', (req, res) => res.send('OK'));
+    app.post('/momo/collection/callback', handleCollectionCallback);
+    app.post('/momo/disburse/callback', (req, res) => {
+        console.log('Disbursement callback received:', req.body); 
+    });
+
+    const server = new ApolloServer({
+        typeDefs,
+        resolvers,
+        context: ({ req }) => {
+            const token = req.headers.authorization?.replace('Bearer ', '') || '';
+            if (!token) return {};
+            try {
+                const decoded = jwt.verify(token, JWT_SECRET);
+                return { user: { id: decoded.id } }; 
+            } catch {
+                return {};
+            }
+        },
+        introspection: true,
+        playground: true
+    });
+
+    await server.start();
+    server.applyMiddleware({
+    app,
+    path: "/graphql",
+    cors: false // disable Apollo CORS because Express handles it
+});
+
+    
+    app.listen(PORT, '0.0.0.0', () => {  // ← Change to '0.0.0.0'
+      console.log(`🚀 Server ready at http://localhost:${PORT}`);
+      console.log(`📱 Access from phone: http://192.168.43.245:${PORT}`); // Your IP
+      console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
+      console.log(`📁 File uploads at http://localhost:${PORT}/api/upload`);
+      console.log(`📸 Uploaded images at http://localhost:${PORT}/uploads/`);
+  });
+}
+
+start().catch(console.error);

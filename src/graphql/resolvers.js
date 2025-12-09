@@ -1,0 +1,370 @@
+// =============================
+// RESOLVERS (FULL CORRECTED VERSION)
+// =============================
+import bcrypt from "bcryptjs";  
+import jwt from "jsonwebtoken";
+import prisma from "../utils/prismaClient.js";
+import { JWT_SECRET } from "../config/env.js";
+import { v4 as uuidv4 } from "uuid";
+import { collectPayment } from "../services/momoService.js";
+
+const COMMISSION_FEE = 5;
+
+const resolvers = {
+  Query: {
+    me: (_, __, { user }) => user || null,
+
+    users: async () => {
+      return prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          phone: true,
+        }
+      });
+    },
+    
+    properties: async (_, { type }) => {
+      const where = type ? { type } : {};
+      return prisma.property.findMany({
+        where,
+        include: { 
+          user: true, 
+          company: true,
+          propertyimage: { orderBy: { order: 'asc' } }
+        },
+      });
+    },
+
+    property: async (_, { id }) =>
+      prisma.property.findUnique({
+        where: { id },
+        include: { 
+          user: true, 
+          company: true,
+          propertyimage: { orderBy: { order: 'asc' } }
+        },
+      }),
+
+    dashboardStats: async () => {
+      const totalProperties = await prisma.property.count();
+      const totalUsers = await prisma.user.count();
+      const availableProperties = await prisma.property.count({
+        where: { status: "available" },
+      });
+       const rentedProperties = await prisma.property.count({
+    where: { status: "taken" },
+    });
+      return {
+        totalProperties,
+        totalUsers,
+        availableProperties,
+        rentedProperties,
+      };
+    },
+
+    myBookings: async (_, __, { user }) => {
+      if (!user) throw new Error("Not authenticated");
+
+      return prisma.booking.findMany({
+        where: { userId: user.id },
+        include: { property: true, user: true },
+      });
+    },
+
+    companies: async () =>
+      prisma.company.findMany({ include: { property: true } }),
+
+    company: async (_, { id }) =>
+      prisma.company.findUnique({
+        where: { id },
+        include: { property: true },
+      }),
+  },
+  
+  Mutation: {
+    // AUTH ======================================================
+    register: async (_, { input }) => {
+      const hashed = await bcrypt.hash(input.password, 10);
+
+      const user = await prisma.user.create({
+        data: {
+          name: input.name,
+          email: input.email,
+          password: hashed,
+          phone: input.phone,
+        },
+      });
+
+      const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      return { token, user };
+    },
+
+    login: async (_, { email, password }) => {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) throw new Error("Invalid credentials");
+      if (!(await bcrypt.compare(password, user.password)))
+        throw new Error("Invalid credentials");
+
+      const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      return { token, user };
+    },
+
+    // PROPERTY CRUD =============================================
+    addProperty: async (_, { input }, { user }) => {
+      if (!user) throw new Error("Not authenticated");
+
+      const defaultCompany = await prisma.company.findFirst({
+        where: { isOwnCompany: true },
+      });
+
+      if (!defaultCompany) {
+        throw new Error("Default company (Ho Rentals) not found.");
+      }
+
+      return prisma.property.create({
+        data: {
+          title: input.title,
+          location: input.location,
+          price: input.price,
+          description: input.description,
+          contact: input.contact,
+          type: input.type,
+          status: input.status || "available",
+          imageUrl: input.imageUrl,
+          propertyimage: {
+            create: input.gallery?.map((img, index) => ({
+              url: img.url,
+              caption: img.caption,
+              order: img.order || index,
+            })) || []
+          },
+          ownerId: user.id,
+          companyId: defaultCompany.id,
+        },
+        include: { 
+          user: true, 
+          company: true,
+          propertyimage: { orderBy: { order: 'asc' } }
+        },
+      });
+    },
+
+    updateProperty: async (_, { id, input }, { user }) => {
+      if (!user) throw new Error("Not authenticated");
+
+      const property = await prisma.property.findUnique({
+        where: { id },
+      });
+
+      if (!property) throw new Error("Property not found");
+
+      if (property.ownerId !== user.id && user.role !== "admin") {
+        throw new Error("Not authorized");
+      }
+
+      // Update property main fields
+      const updated = await prisma.property.update({
+        where: { id },
+        data: {
+          title: input.title,
+          location: input.location,
+          price: input.price,
+          description: input.description,
+          contact: input.contact,
+          type: input.type,
+          status: input.status,
+          imageUrl: input.imageUrl,
+        },
+        include: { user: true, company: true, propertyimage: true },
+      });
+
+      // Update gallery images if provided
+      if (input.gallery) {
+        await prisma.propertyimage.deleteMany({
+          where: { propertyId: id },
+        });
+
+        await prisma.propertyimage.createMany({
+          data: input.gallery.map((img, index) => ({
+            url: img.url,
+            caption: img.caption,
+            order: img.order || index,
+            propertyId: id,
+          })),
+        });
+      }
+
+      return prisma.property.findUnique({
+        where: { id },
+        include: { 
+          user: true, 
+          company: true, 
+          propertyimage: { orderBy: { order: "asc" } }
+        },
+      });
+    },
+
+    deleteProperty: async (_, { id }, { user }) => {
+      if (!user) throw new Error("Not authenticated");
+
+      const property = await prisma.property.findUnique({
+        where: { id },
+      });
+      if (!property) throw new Error("Property not found");
+
+      if (property.ownerId !== user.id && user.role !== "admin") {
+        throw new Error("Not authorized");
+      }
+
+      return prisma.property.delete({
+        where: { id },
+        include: { user: true, company: true },
+      });
+    },
+
+    // BOOKINGS ===================================================
+    createBooking: async (
+      _,
+      { propertyId, startDate, endDate, totalAmount },
+      { user }
+    ) => {
+      if (!user) throw new Error("Not authenticated");
+      if (!user.phone)
+        throw new Error("User phone number required for payment");
+
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      if (start >= end)
+        throw new Error("End date must be after start date");
+
+      const overlapping = await prisma.booking.findFirst({
+        where: {
+          propertyId,
+          OR: [
+            { startDate: { lte: end }, endDate: { gte: start } },
+          ],
+          status: { notIn: ["cancelled"] },
+        },
+      });
+
+      if (overlapping) throw new Error("Property already booked");
+
+      const property = await prisma.property.findUnique({
+        where: { id: propertyId },
+        include: { company: true },
+      });
+      if (!property) throw new Error("Property not found");
+
+      const companyId = property.companyId;
+
+      let commissionAmount = 0;
+      if (!property.company.isOwnCompany) {
+        commissionAmount = COMMISSION_FEE;
+      }
+
+      const momoTxId = `tx_${uuidv4()}`;
+
+      try {
+        await collectPayment(
+          user.phone,
+          totalAmount,
+          momoTxId,
+          `Booking for ${property.title}`
+        );
+      } catch (error) {
+        throw new Error(`Payment failed: ${error.message}`);
+      }
+
+      return prisma.booking.create({
+        data: {
+          propertyId,
+          userId: user.id,
+          companyId,
+          startDate: start,
+          endDate: end,
+          totalAmount,
+          commissionAmount,
+          momoTxId,
+          status: "pending_payment",
+        },
+        include: { property: true, user: true, company: true },
+      });
+    },
+
+    // COMPANY ====================================================
+    createCompany: async (_, { input }, { user }) => {
+      if (!user || user.role !== "admin")
+        throw new Error("Admin only");
+
+      return prisma.company.create({
+        data: input,
+      });
+    },
+
+    createPartner: async (_, { input }, { user }) => {
+      if (!user || user.role !== "admin")
+        throw new Error("Admin only");
+
+      const hashed = await bcrypt.hash(input.password, 10);
+
+      let companyId = input.companyId;
+
+      // Create new company if not provided
+      if (!companyId) {
+        const newCompany = await prisma.company.create({
+          data: {
+            name: input.companyName,
+            logoUrl: input.logoUrl || "",
+            contact: input.contact,
+            momoAccount: input.momoAccount,
+            isOwnCompany: false,
+          },
+        });
+        companyId = newCompany.id;
+      }
+
+      const partner = await prisma.user.create({
+        data: {
+          name: input.userName,
+          email: input.email,
+          password: hashed,
+          phone: input.phone,
+          role: "partner",
+          companyId,
+        },
+      });
+
+      const token = jwt.sign({ id: partner.id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      return { token, user: partner };
+    },
+
+    updatePropertyCompany: async (_, { id, companyId }) => {
+      return prisma.property.update({
+        where: { id },
+        data: { companyId },
+        include: { company: true },
+      });
+    },
+  },
+
+  // ✅ Property type resolver (OUTSIDE of Mutation object!)
+  Property: {
+    gallery: (parent) => {
+      return parent.propertyimage || [];
+    }
+  }
+};
+
+export default resolvers;

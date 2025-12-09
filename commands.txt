@@ -1,0 +1,3 @@
+npx prisma migrate dev --name init: Creates tables in MySQL.
+
+npx prisma generate: Generates the Prisma client for use in resolvers.

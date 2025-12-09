@@ -1,0 +1,2 @@
+npm install apollo-server-express express graphql prisma @prisma/client jsonwebtoken bcryptjs
+npm install --save-dev prisma
