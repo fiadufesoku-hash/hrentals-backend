@@ -1,22 +1,44 @@
+// services/uploadService.js
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
-import pkg from "multer-storage-cloudinary";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+import { v2 as cloudinary } from "cloudinary";
+import pkg from "multer-storage-cloudinary"; // Import CommonJS pkg
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const { CloudinaryStorage } = pkg;
+const { CloudinaryStorage } = pkg; // Destructure CloudinaryStorage
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+// ---------------- LOCAL STORAGE ----------------
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const localStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadsDir = path.join(__dirname, "../uploads");
+    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}_${file.originalname}`;
+    cb(null, uniqueName);
+  },
 });
 
-// Cloudinary storage
+export const localUpload = multer({
+  storage: localStorage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) cb(null, true);
+    else cb(new Error("Only image files are allowed!"), false);
+  },
+});
+
+// ---------------- CLOUDINARY STORAGE ----------------
+cloudinary.config(process.env.CLOUDINARY_URL);
+
 const cloudStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -27,17 +49,5 @@ const cloudStorage = new CloudinaryStorage({
 
 export const cloudUpload = multer({ storage: cloudStorage });
 
-// Local storage (for development)
-const localStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadsDir = path.join(process.cwd(), "uploads");
-    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => cb(null, `${Date.now()}_${file.originalname}`),
-});
-
-export const localUpload = multer({ storage: localStorage });
-
-// Choose dynamically based on USE_RAILWAY
+// ---------------- DYNAMIC UPLOAD ----------------
 export const upload = process.env.USE_RAILWAY === "true" ? cloudUpload : localUpload;
