@@ -1,19 +1,15 @@
-// services/uploadService.js
+// src/services/uploadService.js
 import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
-import pkg from "multer-storage-cloudinary";   // ✅ correct import
+import pkg from "multer-storage-cloudinary";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// Extract CloudinaryStorage correctly
-const { CloudinaryStorage } = pkg;   // ✅ this fixes your error
-  // ✅ this fixes your error
-
-// Get directory name in ES modules
+// ✅ Get directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -48,7 +44,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const cloudStorage = new CloudinaryStorage({
+// Get default export from multer-storage-cloudinary
+const cloudinaryStorage = pkg.default;
+
+const cloudStorage = cloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "horentals",
@@ -59,5 +58,4 @@ const cloudStorage = new CloudinaryStorage({
 export const cloudUpload = multer({ storage: cloudStorage });
 
 // ---------------- DYNAMIC UPLOAD ----------------
-export const upload =
-  process.env.USE_RAILWAY === "true" ? cloudUpload : localUpload;
+export const upload = process.env.USE_RAILWAY === "true" ? cloudUpload : localUpload;
