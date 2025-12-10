@@ -4,12 +4,13 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js",
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
     "build": "prisma generate --schema=src/prisma/schema.prisma",
     "db:push": "prisma db push --schema=src/prisma/schema.prisma"
   },
   "dependencies": {
+    "@fluidjs/multer-cloudinary": "^1.0.4",
     "@prisma/client": "^6.19.0",
     "apollo-server-express": "^3.13.0",
     "axios": "^1.6.2",
@@ -22,7 +23,6 @@
     "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
-    "multer-storage-cloudinary": "^2.2.1",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
