@@ -5,18 +5,18 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
-import { createRequire } from 'node:module'; // Add this
+import { createRequire } from 'node:module';
 
-const require = createRequire(import.meta.url); // Add this
-const pkg = require('multer-storage-cloudinary'); // Change to require
-const { CloudinaryStorage } = pkg; // Destructure from pkg
+const require = createRequire(import.meta.url);
+const pkg = require('multer-storage-cloudinary');
+const { CloudinaryStorage } = pkg;
 
 dotenv.config();
 
-// ---------------- LOCAL STORAGE ----------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// ---------------- LOCAL STORAGE ----------------
 const localStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadsDir = path.join(__dirname, "../uploads");
@@ -41,7 +41,7 @@ export const localUpload = multer({
 // ---------------- CLOUDINARY STORAGE ----------------
 cloudinary.config(process.env.CLOUDINARY_URL);
 
-const cloudStorage = new CloudinaryStorage({
+const cloudStorage = new CloudinaryStorage({  // ← This stays HERE, not in server.js
   cloudinary,
   params: {
     folder: "horentals",

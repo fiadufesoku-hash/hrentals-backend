@@ -1,55 +1,116 @@
-// services/uploadService.js
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import { v2 as cloudinary } from "cloudinary";
+// src/server.js
+import express from "express";
 import dotenv from "dotenv";
-import { createRequire } from 'node:module'; // Add this
+import { ApolloServer } from "apollo-server-express";
+import jwt from "jsonwebtoken";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const require = createRequire(import.meta.url); // Add this
-const pkg = require('multer-storage-cloudinary'); // Change to require
-const { CloudinaryStorage } = pkg; // Destructure from pkg
+import { typeDefs } from "./graphql/schema.js";
+import resolvers from "./graphql/resolvers.js";
+import { handleCollectionCallback } from "./services/momoService.js";
+import { upload } from "./services/uploadService.js"; // ← Only import upload (handles Cloudinary/local)
 
-dotenv.config();
+dotenv.config({ path: "./src/.env" });
 
-// ---------------- LOCAL STORAGE ----------------
+// ---------------- DATABASE ----------------
+// Fallback chain (Railway auto-provides DATABASE_URL via ${{MYSQLURL}})
+process.env.DATABASE_URL =
+  process.env.DATABASE_URL_RAILWAY ||
+  process.env.DATABASE_URL ||
+  "";
+
+console.log(
+  "Using database:",
+  process.env.DATABASE_URL.includes("railway") ? "Railway" : "Local XAMPP"
+);
+
+// ---------------- APP SETUP ----------------
+const app = express();
+
+// CORS
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// Parse JSON requests
+app.use(express.json());
+
+// Serve local uploads folder (only if NOT on Railway)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+if (process.env.USE_RAILWAY !== "true") {
+  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+}
 
-const localStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadsDir = path.join(__dirname, "../uploads");
-    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}_${file.originalname}`;
-    cb(null, uniqueName);
-  },
+// ---------------- FILE UPLOAD ROUTES ----------------
+// Single file upload
+app.post("/api/upload", upload.single("image"), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+  const isCloudinary = req.file.path?.startsWith("http");
+  const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
+  const imageUrl = isCloudinary
+    ? req.file.path
+    : `${baseUrl}/uploads/${req.file.filename}`;
+
+  res.json({ success: true, imageUrl, filename: req.file.filename });
 });
 
-export const localUpload = multer({
-  storage: localStorage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) cb(null, true);
-    else cb(new Error("Only image files are allowed!"), false);
-  },
+// Multiple file upload
+app.post("/api/upload-multiple", upload.array("images", 10), (req, res) => {
+  if (!req.files || req.files.length === 0)
+    return res.status(400).json({ error: "No files uploaded" });
+
+  const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
+  const imageUrls = req.files.map((file) => {
+    return file.path.startsWith("http")
+      ? file.path
+      : `${baseUrl}/uploads/${file.filename}`;
+  });
+
+  res.json({ success: true, imageUrls, count: req.files.length });
 });
 
-// ---------------- CLOUDINARY STORAGE ----------------
-cloudinary.config(process.env.CLOUDINARY_URL);
+// ---------------- OTHER ROUTES ----------------
+app.get("/health", (_, res) => res.send("OK"));
 
-const cloudStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "horentals",
-    allowed_formats: ["jpg", "jpeg", "png"],
+app.post("/momo/collection/callback", handleCollectionCallback);
+
+app.post("/momo/disburse/callback", (req, res) =>
+  console.log("Disbursement callback received:", req.body)
+);
+
+// ---------------- GRAPHQL SERVER ----------------
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => {
+    const token = req.headers.authorization?.replace("Bearer ", "") || "";
+    if (!token) return {};
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      return { user: { id: decoded.id } };
+    } catch {
+      return {};
+    }
   },
+  introspection: true,
+  playground: true,
 });
 
-export const cloudUpload = multer({ storage: cloudStorage });
+await server.start();
+server.applyMiddleware({ app, path: "/graphql", cors: false });
 
-// ---------------- DYNAMIC UPLOAD ----------------
-export const upload = process.env.USE_RAILWAY === "true" ? cloudUpload : localUpload;
+// ---------------- START SERVER ----------------
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 GraphQL available at http://localhost:${PORT}/graphql`);
+});
