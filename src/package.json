@@ -2,22 +2,13 @@
   "name": "ho-rentals-backend",
   "version": "1.0.0",
   "type": "module",
-  "main": "src/server.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
+    "dev": "nodemon server.js",
+    "start": "node server.js",
     "build": "prisma generate --schema=src/prisma/schema.prisma",
     "db:push": "prisma db push --schema=src/prisma/schema.prisma"
   },
-  "keywords": [
-    "graphql",
-    "apollo",
-    "prisma",
-    "rental"
-  ],
-  "author": "",
-  "license": "ISC",
-  "description": "Ho Rentals GraphQL API",
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "apollo-server-express": "^3.13.0",
