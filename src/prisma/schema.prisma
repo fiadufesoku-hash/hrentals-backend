@@ -51,7 +51,7 @@ model Property {
   company     Company   @relation(fields: [companyId], references: [id])
   bookings    Booking[]
   createdAt   DateTime @default(now())
-}s
+}
 
 model Booking {
   id         Int      @id @default(autoincrement())
