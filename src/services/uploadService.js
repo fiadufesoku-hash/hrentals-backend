@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
-import pkg from "multer-storage-cloudinary";
+import cloudinaryStorage from "multer-storage-cloudinary";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -44,15 +44,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Get default export from multer-storage-cloudinary
-const cloudinaryStorage = pkg.default;
-
 const cloudStorage = cloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: "horentals",
-    allowed_formats: ["jpg", "jpeg", "png"],
-  },
+  folder: "horentals",
+  allowedFormats: ["jpg", "jpeg", "png"],
 });
 
 export const cloudUpload = multer({ storage: cloudStorage });
