@@ -4,12 +4,8 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "@fluidjs/multer-cloudinary"; // ← New modern import
 import dotenv from "dotenv";
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-const pkg = require('multer-storage-cloudinary');
-const { CloudinaryStorage } = pkg;
 
 dotenv.config();
 
@@ -41,11 +37,11 @@ export const localUpload = multer({
 // ---------------- CLOUDINARY STORAGE ----------------
 cloudinary.config(process.env.CLOUDINARY_URL);
 
-const cloudStorage = new CloudinaryStorage({  // ← This stays HERE, not in server.js
-  cloudinary,
+const cloudStorage = new CloudinaryStorage({
+  cloudinary, // ← Passes your v2 instance
   params: {
     folder: "horentals",
-    allowed_formats: ["jpg", "jpeg", "png"],
+    allowed_formats: ["jpg", "jpeg", "png", "webp"], // Added webp for modern optimization
   },
 });
 
