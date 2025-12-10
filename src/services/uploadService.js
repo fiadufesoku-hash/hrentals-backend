@@ -4,12 +4,14 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { v2 as cloudinary } from "cloudinary";
-import pkg from "multer-storage-cloudinary"; // Import CommonJS pkg
 import dotenv from "dotenv";
+import { createRequire } from 'node:module'; // Add this
+
+const require = createRequire(import.meta.url); // Add this
+const pkg = require('multer-storage-cloudinary'); // Change to require
+const { CloudinaryStorage } = pkg; // Destructure from pkg
 
 dotenv.config();
-
-const { CloudinaryStorage } = pkg; // Destructure CloudinaryStorage
 
 // ---------------- LOCAL STORAGE ----------------
 const __filename = fileURLToPath(import.meta.url);
