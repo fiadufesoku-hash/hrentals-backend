@@ -7,7 +7,7 @@ import { v2 as cloudinary } from "cloudinary";
 import pkg from "multer-storage-cloudinary"; // Import CommonJS pkg
 import dotenv from "dotenv";
 
-dotenv.config({ path: './src/.env' })
+dotenv.config()
 
 const { CloudinaryStorage } = pkg; // Destructure CloudinaryStorage
 
