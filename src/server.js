@@ -1,4 +1,3 @@
-// src/server.js
 import express from "express";
 import dotenv from "dotenv";
 import { ApolloServer } from "apollo-server-express";
@@ -10,95 +9,73 @@ import { fileURLToPath } from "url";
 import { typeDefs } from "./graphql/schema.js";
 import resolvers from "./graphql/resolvers.js";
 import { handleCollectionCallback } from "./services/momoService.js";
-import { upload } from "./services/uploadService.js"; // ← Only import upload (handles Cloudinary/local)
+import { upload } from "./services/uploadService.js";
 
 dotenv.config({ path: "./src/.env" });
 
-// ---------------- DATABASE ----------------
-// Fallback chain (Railway auto-provides DATABASE_URL via ${{MYSQLURL}})
-process.env.DATABASE_URL =
-  process.env.DATABASE_URL_RAILWAY ||
-  process.env.DATABASE_URL ||
-  "";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-console.log(
-  "Using database:",
-  process.env.DATABASE_URL.includes("railway") ? "Railway" : "Local XAMPP"
-);
-
-// ---------------- APP SETUP ----------------
 const app = express();
 
-// CORS
+// CORS – allow Flutter Web from anywhere
 app.use(
   cors({
     origin: "*",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// Parse JSON requests
 app.use(express.json());
 
-// Serve local uploads folder (only if NOT on Railway)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Serve uploaded images when running locally
 if (process.env.USE_RAILWAY !== "true") {
   app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 }
 
-// ---------------- FILE UPLOAD ROUTES ----------------
-// Single file upload
+// ==================== FILE UPLOADS ====================
 app.post("/api/upload", upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
   const isCloudinary = req.file.path?.startsWith("http");
-  const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
-  const imageUrl = isCloudinary
-    ? req.file.path
-    : `${baseUrl}/uploads/${req.file.filename}`;
+  const base = process.env.BASE_URL || `http://localhost:${PORT}`;
+  const url = isCloudinary ? req.file.path : `${base}/uploads/${req.file.filename}`;
 
-  res.json({ success: true, imageUrl, filename: req.file.filename });
+  res.json({ success: true, imageUrl: url });
 });
 
-// Multiple file upload
 app.post("/api/upload-multiple", upload.array("images", 10), (req, res) => {
-  if (!req.files || req.files.length === 0)
-    return res.status(400).json({ error: "No files uploaded" });
+  if (!req.files?.length) return res.status(400).json({ error: "No files" });
 
-  const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
-  const imageUrls = req.files.map((file) => {
-    return file.path.startsWith("http")
-      ? file.path
-      : `${baseUrl}/uploads/${file.filename}`;
-  });
+  const base = process.env.BASE_URL || `http://localhost:${PORT}`;
+  const urls = req.files.map(f => 
+    f.path.startsWith("http") ? f.path : `${base}/uploads/${f.filename}`
+  );
 
-  res.json({ success: true, imageUrls, count: req.files.length });
+  res.json({ success: true, imageUrls: urls });
 });
 
-// ---------------- OTHER ROUTES ----------------
+// ==================== OTHER ROUTES ====================
 app.get("/health", (_, res) => res.send("OK"));
-
 app.post("/momo/collection/callback", handleCollectionCallback);
+app.post("/momo/disburse/callback", (req, res) => {
+  console.log("Disbursement:", req.body);
+  res.sendStatus(200);
+});
 
-app.post("/momo/disburse/callback", (req, res) =>
-  console.log("Disbursement callback received:", req.body)
-);
-
-// ---------------- GRAPHQL SERVER ----------------
+// ==================== GRAPHQL ====================
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => {
     const token = req.headers.authorization?.replace("Bearer ", "") || "";
-    if (!token) return {};
+    if (!token) return { user: null };
+
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       return { user: { id: decoded.id } };
     } catch {
-      return {};
+      return { user: null };
     }
   },
   introspection: true,
@@ -108,9 +85,9 @@ const server = new ApolloServer({
 await server.start();
 server.applyMiddleware({ app, path: "/graphql", cors: false });
 
-// ---------------- START SERVER ----------------
+// ==================== START ====================
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🚀 GraphQL available at http://localhost:${PORT}/graphql`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`GraphQL → ${process.env.BASE_URL || `http://localhost:${PORT}`}/graphql`);
 });

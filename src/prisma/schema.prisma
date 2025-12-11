@@ -23,7 +23,7 @@ model Company {
   createdAt    DateTime  @default(now())
 }
 
-model User {
+model user {
   id        Int       @id @default(autoincrement())
   name      String
   email     String    @unique
@@ -45,7 +45,7 @@ model Property {
   description String?
   imageUrl    String?   // <-- only this field exists
   ownerId     Int
-  owner       User     @relation(fields: [ownerId], references: [id])
+  owner       user     @relation(fields: [ownerId], references: [id])
   companyId   Int
   contact     String?
   company     Company   @relation(fields: [companyId], references: [id])
@@ -61,7 +61,7 @@ model Booking {
   status     String   @default("pending")
   userId     Int
   propertyId Int
-  user       User     @relation(fields: [userId], references: [id])
+  user       user     @relation(fields: [userId], references: [id])
   property   Property @relation(fields: [propertyId], references: [id])
   companyId  Int
   commissionAmount  Float @default(0) // 5ghc for partners, 0 for your company
