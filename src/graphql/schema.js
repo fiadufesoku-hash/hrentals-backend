@@ -2,6 +2,9 @@ export const typeDefs = `
     scalar DateTime
     scalar Upload
 
+    ##########################
+    # OBJECT TYPES
+    ##########################
     type PropertyImage {
         id: Int!
         url: String!
@@ -24,20 +27,10 @@ export const typeDefs = `
         totalProperties: Int!
         totalUsers: Int!
         availableProperties: Int!
+        rentedProperties: Int!
     }
 
-    type Query {
-        me: user
-        properties(type: String): [Property!]!
-        dashboardStats: DashboardStats!
-        property(id: Int!): Property
-        companies: [Company!]!
-        company(id: Int!): Company
-        myBookings: [Booking!]!
-        users: [user!]!
-    }
-
-    type user {                     # ← lowercase u
+    type User {
         id: Int!
         name: String!
         email: String!
@@ -57,14 +50,8 @@ export const typeDefs = `
         imageUrl: String
         gallery: [PropertyImage!]!
         createdAt: String
-        user: user
+        user: User
         company: Company
-    }
-
-    input PropertyImageInput {
-        url: String!
-        caption: String
-        order: Int!
     }
 
     type Booking {
@@ -73,22 +60,32 @@ export const typeDefs = `
         endDate: DateTime!
         totalAmount: Float!
         status: String!
-        user: user!
+        user: User!
         property: Property!
         company: Company!
         commissionAmount: Float!
+        momoTxId: String
     }
 
     type AuthPayload {
         token: String!
-        user: user!
+        user: User!
     }
 
+    ##########################
+    # INPUT TYPES
+    ##########################
     input RegisterInput {
         name: String!
         email: String!
         password: String!
         phone: String
+    }
+
+    input PropertyImageInput {
+        url: String!
+        caption: String
+        order: Int!
     }
 
     input PropertyInput {
@@ -103,6 +100,35 @@ export const typeDefs = `
         gallery: [PropertyImageInput!]
     }
 
+    input PartnerInput {
+        userName: String!
+        email: String!
+        password: String!
+        phone: String
+        companyId: Int
+        companyName: String
+        logoUrl: String
+        contact: String
+        momoAccount: String
+    }
+
+    ##########################
+    # QUERIES
+    ##########################
+    type Query {
+        me: User
+        users: [User!]!
+        properties(type: String): [Property!]!
+        property(id: Int!): Property
+        myBookings: [Booking!]!
+        companies: [Company!]!
+        company(id: Int!): Company
+        dashboardStats: DashboardStats!
+    }
+
+    ##########################
+    # MUTATIONS
+    ##########################
     type Mutation {
         register(input: RegisterInput!): AuthPayload!
         login(email: String!, password: String!): AuthPayload!

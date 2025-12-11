@@ -1,40 +1,39 @@
-// generate JavaScript client for querying the database
 generator client {
   provider = "prisma-client-js"
 }
 
-// configure mysql connection using db url
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-// define database tables with fields and relationships
-model Company {
-  id           Int       @id @default(autoincrement())
-  name         String    @unique  // e.g., "Ho Rentals" or "Partner Co 1"
-  logoUrl      String?   // URL to logo image (upload via signed URL like properties)
-  contact      String    // Phone/email for inquiries
-  isOwnCompany Boolean   @default(false)  // true only for your company
-  momoAccount  String?   // Partner's MoMo MSISDN (e.g., "233xxxxxxxx") for payouts
-  users        User[]    // Owners affiliated with this company
-  properties   Property[]
-  bookings     Booking[]
-  createdAt    DateTime  @default(now())
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  phone     String?
+  companyId Int?
+  createdAt DateTime @default(now())
+
+  bookings   Booking[]
+  properties Property[]
+  company    Company?   @relation(fields: [companyId], references: [id])
 }
 
-model user {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  password  String
-  role      String    @default("user")
-  phone     String?   
+model Company {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  logoUrl      String?
+  contact      String
+  isOwnCompany Boolean  @default(false)
+  momoAccount  String?
+  createdAt    DateTime @default(now())
+
+  users      User[]
   properties Property[]
   bookings   Booking[]
-  companyId Int?      // make optional
-  company   Company?  @relation(fields: [companyId], references: [id]) 
-  createdAt DateTime  @default(now())
 }
 
 model Property {
@@ -43,29 +42,45 @@ model Property {
   location    String
   price       Float
   description String?
-  imageUrl    String?   // <-- only this field exists
-  ownerId     Int
-  owner       user     @relation(fields: [ownerId], references: [id])
-  companyId   Int
+  imageUrl    String?
+  status      String   @default("available")
+  type        String?
   contact     String?
-  company     Company   @relation(fields: [companyId], references: [id])
-  bookings    Booking[]
+  ownerId     Int
+  companyId   Int
   createdAt   DateTime @default(now())
+
+  owner    User            @relation(fields: [ownerId], references: [id])
+  company  Company         @relation(fields: [companyId], references: [id])
+  bookings Booking[]
+  images   PropertyImage[]
+}
+
+model PropertyImage {
+  id         Int      @id @default(autoincrement())
+  url        String
+  caption    String?
+  order      Int      @default(0)
+  propertyId Int
+  createdAt  DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id])
 }
 
 model Booking {
-  id         Int      @id @default(autoincrement())
-  startDate  DateTime
-  endDate    DateTime
-  totalAmount Float
-  status     String   @default("pending")
-  userId     Int
-  propertyId Int
-  user       user     @relation(fields: [userId], references: [id])
-  property   Property @relation(fields: [propertyId], references: [id])
-  companyId  Int
-  commissionAmount  Float @default(0) // 5ghc for partners, 0 for your company
-  momoTxId  String? //reference to MoMo transaction
-  company   Company   @relation(fields: [companyId], references: [id])
-  createdAt  DateTime @default(now())
+  id               Int      @id @default(autoincrement())
+  startDate        DateTime
+  endDate          DateTime
+  totalAmount      Float
+  status           String   @default("pending")
+  commissionAmount Float    @default(0)
+  momoTxId         String?
+  userId           Int
+  propertyId       Int
+  companyId        Int
+  createdAt        DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
+  company  Company  @relation(fields: [companyId], references: [id])
 }

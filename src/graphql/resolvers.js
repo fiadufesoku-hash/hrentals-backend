@@ -1,13 +1,17 @@
-// =============================
-// RESOLVERS (FULL CORRECTED VERSION)
-// =============================
-import bcrypt from "bcryptjs";  
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../utils/prismaClient.js";
 import { JWT_SECRET } from "../config/env.js";
 import { v4 as uuidv4 } from "uuid";
 
+// Commission fee for partner bookings
 const COMMISSION_FEE = 5;
+
+// Example placeholder for payment collection
+async function collectPayment(phone, amount, transactionId, description) {
+  // Implement actual MoMo payment logic here
+  return true;
+}
 
 const resolvers = {
   Query: {
@@ -15,79 +19,69 @@ const resolvers = {
 
     users: async () => {
       return prisma.user.findMany({
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          phone: true,
-        }
+        select: { id: true, name: true, email: true, role: true, phone: true },
       });
     },
-    
+
     properties: async (_, { type }) => {
       const where = type ? { type } : {};
       return prisma.property.findMany({
         where,
-        include: { 
-          user: true, 
+        include: {
+          owner: true,
           company: true,
-          propertyimage: { orderBy: { order: 'asc' } }
+          images: { orderBy: { order: "asc" } },
         },
       });
     },
 
-    property: async (_, { id }) =>
-      prisma.property.findUnique({
+    property: async (_, { id }) => {
+      return prisma.property.findUnique({
         where: { id },
-        include: { 
-          user: true, 
+        include: {
+          owner: true,
           company: true,
-          propertyimage: { orderBy: { order: 'asc' } }
+          images: { orderBy: { order: "asc" } },
         },
-      }),
+      });
+    },
 
     dashboardStats: async () => {
+      // After regenerating Prisma client, status filter works
       const totalProperties = await prisma.property.count();
       const totalUsers = await prisma.user.count();
       const availableProperties = await prisma.property.count({
         where: { status: "available" },
       });
-       const rentedProperties = await prisma.property.count({
-    where: { status: "taken" },
-    });
-      return {
-        totalProperties,
-        totalUsers,
-        availableProperties,
-        rentedProperties,
-      };
+      const rentedProperties = await prisma.property.count({
+        where: { status: "taken" },
+      });
+      return { totalProperties, totalUsers, availableProperties, rentedProperties };
     },
 
     myBookings: async (_, __, { user }) => {
       if (!user) throw new Error("Not authenticated");
-
       return prisma.booking.findMany({
         where: { userId: user.id },
-        include: { property: true, user: true },
+        include: {
+          property: { include: { owner: true } },
+          company: true,
+        },
       });
     },
 
-    companies: async () =>
-      prisma.company.findMany({ include: { property: true } }),
+    companies: async () => {
+      return prisma.company.findMany({ include: { properties: true } });
+    },
 
-    company: async (_, { id }) =>
-      prisma.company.findUnique({
-        where: { id },
-        include: { property: true },
-      }),
+    company: async (_, { id }) => {
+      return prisma.company.findUnique({ where: { id }, include: { properties: true } });
+    },
   },
-  
+
   Mutation: {
-    // AUTH ======================================================
     register: async (_, { input }) => {
       const hashed = await bcrypt.hash(input.password, 10);
-
       const user = await prisma.user.create({
         data: {
           name: input.name,
@@ -97,37 +91,25 @@ const resolvers = {
         },
       });
 
-      const token = jwt.sign({ id: user.id }, JWT_SECRET, {
-        expiresIn: "7d",
-      });
-
+      const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "7d" });
       return { token, user };
     },
 
     login: async (_, { email, password }) => {
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) throw new Error("Invalid credentials");
-      if (!(await bcrypt.compare(password, user.password)))
-        throw new Error("Invalid credentials");
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid) throw new Error("Invalid credentials");
 
-      const token = jwt.sign({ id: user.id }, JWT_SECRET, {
-        expiresIn: "7d",
-      });
-
+      const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "7d" });
       return { token, user };
     },
 
-    // PROPERTY CRUD =============================================
     addProperty: async (_, { input }, { user }) => {
       if (!user) throw new Error("Not authenticated");
 
-      const defaultCompany = await prisma.company.findFirst({
-        where: { isOwnCompany: true },
-      });
-
-      if (!defaultCompany) {
-        throw new Error("Default company (Ho Rentals) not found.");
-      }
+      const defaultCompany = await prisma.company.findFirst({ where: { isOwnCompany: true } });
+      if (!defaultCompany) throw new Error("Default company not found");
 
       return prisma.property.create({
         data: {
@@ -139,60 +121,31 @@ const resolvers = {
           type: input.type,
           status: input.status || "available",
           imageUrl: input.imageUrl,
-          propertyimage: {
+          ownerId: user.id,
+          companyId: defaultCompany.id,
+          images: {
             create: input.gallery?.map((img, index) => ({
               url: img.url,
               caption: img.caption,
               order: img.order || index,
-            })) || []
+            })) || [],
           },
-          ownerId: user.id,
-          companyId: defaultCompany.id,
         },
-        include: { 
-          user: true, 
-          company: true,
-          propertyimage: { orderBy: { order: 'asc' } }
-        },
+        include: { owner: true, company: true, images: { orderBy: { order: "asc" } } },
       });
     },
 
     updateProperty: async (_, { id, input }, { user }) => {
       if (!user) throw new Error("Not authenticated");
-
-      const property = await prisma.property.findUnique({
-        where: { id },
-      });
-
+      const property = await prisma.property.findUnique({ where: { id } });
       if (!property) throw new Error("Property not found");
+      if (property.ownerId !== user.id && user.role !== "admin") throw new Error("Not authorized");
 
-      if (property.ownerId !== user.id && user.role !== "admin") {
-        throw new Error("Not authorized");
-      }
+      await prisma.property.update({ where: { id }, data: input });
 
-      // Update property main fields
-      const updated = await prisma.property.update({
-        where: { id },
-        data: {
-          title: input.title,
-          location: input.location,
-          price: input.price,
-          description: input.description,
-          contact: input.contact,
-          type: input.type,
-          status: input.status,
-          imageUrl: input.imageUrl,
-        },
-        include: { user: true, company: true, propertyimage: true },
-      });
-
-      // Update gallery images if provided
       if (input.gallery) {
-        await prisma.propertyimage.deleteMany({
-          where: { propertyId: id },
-        });
-
-        await prisma.propertyimage.createMany({
+        await prisma.images.deleteMany({ where: { propertyId: id } });
+        await prisma.images.createMany({
           data: input.gallery.map((img, index) => ({
             url: img.url,
             caption: img.caption,
@@ -204,57 +157,37 @@ const resolvers = {
 
       return prisma.property.findUnique({
         where: { id },
-        include: { 
-          user: true, 
-          company: true, 
-          propertyimage: { orderBy: { order: "asc" } }
-        },
+        include: { owner: true, company: true, images: { orderBy: { order: "asc" } } },
       });
     },
 
     deleteProperty: async (_, { id }, { user }) => {
       if (!user) throw new Error("Not authenticated");
-
-      const property = await prisma.property.findUnique({
-        where: { id },
-      });
+      const property = await prisma.property.findUnique({ where: { id } });
       if (!property) throw new Error("Property not found");
-
-      if (property.ownerId !== user.id && user.role !== "admin") {
-        throw new Error("Not authorized");
-      }
+      if (property.ownerId !== user.id && user.role !== "admin") throw new Error("Not authorized");
 
       return prisma.property.delete({
         where: { id },
-        include: { user: true, company: true },
+        include: { owner: true, company: true },
       });
     },
 
-    // BOOKINGS ===================================================
-    createBooking: async (
-      _,
-      { propertyId, startDate, endDate, totalAmount },
-      { user }
-    ) => {
+    createBooking: async (_, { propertyId, startDate, endDate, totalAmount }, { user }) => {
       if (!user) throw new Error("Not authenticated");
-      if (!user.phone)
-        throw new Error("User phone number required for payment");
+      if (!user.phone) throw new Error("User phone number required");
 
       const start = new Date(startDate);
       const end = new Date(endDate);
-      if (start >= end)
-        throw new Error("End date must be after start date");
+      if (start >= end) throw new Error("End date must be after start date");
 
       const overlapping = await prisma.booking.findFirst({
         where: {
           propertyId,
-          OR: [
-            { startDate: { lte: end }, endDate: { gte: start } },
-          ],
+          OR: [{ startDate: { lte: end }, endDate: { gte: start } }],
           status: { notIn: ["cancelled"] },
         },
       });
-
       if (overlapping) throw new Error("Property already booked");
 
       const property = await prisma.property.findUnique({
@@ -264,24 +197,10 @@ const resolvers = {
       if (!property) throw new Error("Property not found");
 
       const companyId = property.companyId;
-
-      let commissionAmount = 0;
-      if (!property.company.isOwnCompany) {
-        commissionAmount = COMMISSION_FEE;
-      }
-
+      const commissionAmount = property.company.isOwnCompany ? 0 : COMMISSION_FEE;
       const momoTxId = `tx_${uuidv4()}`;
 
-      try {
-        await collectPayment(
-          user.phone,
-          totalAmount,
-          momoTxId,
-          `Booking for ${property.title}`
-        );
-      } catch (error) {
-        throw new Error(`Payment failed: ${error.message}`);
-      }
+      await collectPayment(user.phone, totalAmount, momoTxId, `Booking for ${property.title}`);
 
       return prisma.booking.create({
         data: {
@@ -295,29 +214,24 @@ const resolvers = {
           momoTxId,
           status: "pending_payment",
         },
-        include: { property: true, user: true, company: true },
+        include: {
+          property: { include: { owner: true } },
+          company: true,
+        },
       });
     },
 
-    // COMPANY ====================================================
-    createCompany: async (_, { input }, { user }) => {
-      if (!user || user.role !== "admin")
-        throw new Error("Admin only");
-
-      return prisma.company.create({
-        data: input,
-      });
+    createCompany: async (_, { name, logoUrl, contact, momoAccount }, { user }) => {
+      if (!user || user.role !== "admin") throw new Error("Admin only");
+      return prisma.company.create({ data: { name, logoUrl, contact, momoAccount } });
     },
 
     createPartner: async (_, { input }, { user }) => {
-      if (!user || user.role !== "admin")
-        throw new Error("Admin only");
+      if (!user || user.role !== "admin") throw new Error("Admin only");
 
       const hashed = await bcrypt.hash(input.password, 10);
-
       let companyId = input.companyId;
 
-      // Create new company if not provided
       if (!companyId) {
         const newCompany = await prisma.company.create({
           data: {
@@ -342,10 +256,7 @@ const resolvers = {
         },
       });
 
-      const token = jwt.sign({ id: partner.id }, JWT_SECRET, {
-        expiresIn: "7d",
-      });
-
+      const token = jwt.sign({ id: partner.id }, JWT_SECRET, { expiresIn: "7d" });
       return { token, user: partner };
     },
 
@@ -358,12 +269,9 @@ const resolvers = {
     },
   },
 
-  // ✅ Property type resolver (OUTSIDE of Mutation object!)
   Property: {
-    gallery: (parent) => {
-      return parent.propertyimage || [];
-    }
-  }
+    gallery: (parent) => parent.images || [],
+  },
 };
 
 export default resolvers;
