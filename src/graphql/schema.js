@@ -1,7 +1,3 @@
-// GraphQL API Structure
-// Defines queries and mutations client can run and get back
-
-// ✅ NO IMPORT NEEDED - use template literal
 export const typeDefs = `
     scalar DateTime
     scalar Upload
@@ -31,22 +27,22 @@ export const typeDefs = `
     }
 
     type Query {
-        me: User
+        me: user
         properties(type: String): [Property!]!
         dashboardStats: DashboardStats!
         property(id: Int!): Property
         companies: [Company!]!
         company(id: Int!): Company
         myBookings: [Booking!]!
-        users: [User!]!
+        users: [user!]!
     }
 
-    type User {
+    type user {                     # ← lowercase u
         id: Int!
         name: String!
         email: String!
-        role: String! 
-        phone: String 
+        role: String!
+        phone: String
     }
 
     type Property {
@@ -61,7 +57,7 @@ export const typeDefs = `
         imageUrl: String
         gallery: [PropertyImage!]!
         createdAt: String
-        user: User
+        user: user
         company: Company
     }
 
@@ -77,7 +73,7 @@ export const typeDefs = `
         endDate: DateTime!
         totalAmount: Float!
         status: String!
-        user: User!
+        user: user!
         property: Property!
         company: Company!
         commissionAmount: Float!
@@ -85,7 +81,7 @@ export const typeDefs = `
 
     type AuthPayload {
         token: String!
-        user: User!
+        user: user!
     }
 
     input RegisterInput {
@@ -107,25 +103,6 @@ export const typeDefs = `
         gallery: [PropertyImageInput!]
     }
 
-    input CompanyInput {
-        name: String!
-        logoUrl: String
-        contact: String!
-        momoAccount: String
-    }
-
-    input PartnerInput {
-        userName: String!
-        email: String!
-        password: String!
-        phone: String
-        companyId: Int
-        companyName: String
-        logoUrl: String
-        contact: String!
-        momoAccount: String!
-    }
-
     type Mutation {
         register(input: RegisterInput!): AuthPayload!
         login(email: String!, password: String!): AuthPayload!
@@ -133,7 +110,7 @@ export const typeDefs = `
         updateProperty(id: Int!, input: PropertyInput!): Property!
         deleteProperty(id: Int!): Property!
         createBooking(propertyId: Int!, startDate: DateTime!, endDate: DateTime!, totalAmount: Float!): Booking!
-        createCompany(input: CompanyInput!): Company!
+        createCompany(name: String!, logoUrl: String, contact: String!, momoAccount: String): Company!
         createPartner(input: PartnerInput!): AuthPayload!
         updatePropertyCompany(id: Int!, companyId: Int!): Property!
     }

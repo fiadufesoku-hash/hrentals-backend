@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import prisma from "../utils/prismaClient.js";
 import { JWT_SECRET } from "../config/env.js";
 import { v4 as uuidv4 } from "uuid";
-import { collectPayment } from "../services/momoService.js";
 
 const COMMISSION_FEE = 5;
 

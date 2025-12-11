@@ -7,86 +7,80 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model booking {
-  id               Int      @id @default(autoincrement())
-  startDate        DateTime
-  endDate          DateTime
-  totalAmount      Float
-  status           String   @default("pending")
-  userId           Int
-  propertyId       Int
-  createdAt        DateTime @default(now())
-  commissionAmount Float    @default(0)
-  companyId        Int
-  momoTxId         String?
-  company          company  @relation(fields: [companyId], references: [id], onDelete: Cascade, map: "Booking_companyId_fkey")
-  property         property @relation(fields: [propertyId], references: [id], onDelete: Cascade, map: "Booking_propertyId_fkey")
-  user             user     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Booking_userId_fkey")
+model user {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  role      String    @default("user")
+  phone     String?
+  companyId Int?
+  createdAt DateTime  @default(now())
 
-  @@index([companyId], map: "Booking_companyId_fkey")
-  @@index([propertyId], map: "Booking_propertyId_fkey")
-  @@index([userId], map: "Booking_userId_fkey")
+  bookings   booking[]
+  properties property[]
+  company    company?  @relation(fields: [companyId], references: [id])
 }
 
 model company {
-  id           Int        @id @default(autoincrement())
-  name         String     @unique(map: "Company_name_key")
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
   logoUrl      String?
   contact      String
-  isOwnCompany Boolean    @default(false)
+  isOwnCompany Boolean  @default(false)
   momoAccount  String?
-  createdAt    DateTime   @default(now())
-  booking      booking[]
-  property     property[]
-  user         user[]
+  createdAt    DateTime @default(now())
+
+  users        user[]
+  properties   property[]
+  bookings     booking[]
 }
 
 model property {
-  id            Int             @id @default(autoincrement())
-  title         String
-  location      String
-  price         Float
-  description   String?
-  ownerId       Int
-  createdAt     DateTime        @default(now())
-  companyId     Int
-  contact       String?
-  imageUrl      String?
-  status        String?         @default("available")
-  type          String?
-  booking       booking[]
-  company       company         @relation(fields: [companyId], references: [id], onDelete: Cascade, map: "Property_companyId_fkey")
-  user          user            @relation(fields: [ownerId], references: [id], onDelete: Cascade, map: "Property_ownerId_fkey")
-  propertyimage propertyimage[]
+  id          Int      @id @default(autoincrement())
+  title       String
+  location    String
+  price       Float
+  description String?
+  imageUrl    String?
+  status      String   @default("available")
+  type        String?
+  contact     String?
+  ownerId     Int
+  companyId   Int
+  createdAt   DateTime @default(now())
 
-  @@index([companyId], map: "Property_companyId_fkey")
-  @@index([ownerId], map: "Property_ownerId_fkey")
+  owner       user     @relation(fields: [ownerId], references: [id])
+  company     company  @relation(fields: [companyId], references: [id])
+  bookings    booking[]
+  images      propertyimage[]
 }
 
 model propertyimage {
   id         Int      @id @default(autoincrement())
   url        String
   caption    String?
-  order      Int
+  order      Int      @default(0)
   propertyId Int
   createdAt  DateTime @default(now())
-  property   property @relation(fields: [propertyId], references: [id], onDelete: Cascade, map: "PropertyImage_propertyId_fkey")
 
-  @@index([propertyId], map: "PropertyImage_propertyId_fkey")
+  property   property @relation(fields: [propertyId], references: [id])
 }
 
-model user {
-  id        Int        @id @default(autoincrement())
-  name      String
-  email     String     @unique(map: "User_email_key")
-  password  String
-  role      String     @default("user")
-  createdAt DateTime   @default(now())
-  companyId Int?
-  phone     String?
-  booking   booking[]
-  property  property[]
-  company   company?   @relation(fields: [companyId], references: [id], onDelete: Cascade, map: "User_companyId_fkey")
+model booking {
+  id               Int      @id @default(autoincrement())
+  startDate        DateTime
+  endDate          DateTime
+  totalAmount      Float
+  status           String   @default("pending")
+  commissionAmount Float    @default(0)
+  momoTxId         String?
+  userId           Int
+  propertyId       Int
+  companyId        Int
+  createdAt        DateTime @default(now())
 
-  @@index([companyId], map: "User_companyId_fkey")
+  user             user     @relation(fields: [userId], references: [id])
+  property         property @relation(fields: [propertyId], references: [id])
+  company          company  @relation(fields: [companyId], references: [id])
 }
