@@ -90,4 +90,6 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`GraphQL → ${process.env.BASE_URL || `http://localhost:${PORT}`}/graphql`);
-});
+});"throw new Error('RAILWAY IS NOW USING NEW CODE - VICTORY PROOF');" 
+"// RAILWAY TEST: If you see this crash, I'm using new code" 
+"throw new Error('RAILWAY IS NOW USING NEW CODE - VICTORY PROOF');" 
