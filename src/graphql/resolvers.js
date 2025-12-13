@@ -24,6 +24,11 @@ const resolvers = {
     },
 
     properties: async (_, { type }) => {
+      // Add to your properties resolver
+properties: async (_, { type }, context) => {
+  console.log("GraphQL Query received:", context.body.query);
+  // ... rest of your code
+}
       const where = type ? { type } : {};
       return prisma.property.findMany({
         where,
