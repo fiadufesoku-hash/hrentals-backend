@@ -15,7 +15,7 @@ dotenv.config({ path: "./src/.env" });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+const PORT = process.env.PORT || 4000;
 const app = express();
 
 // CORS – allow Flutter Web from anywhere
@@ -86,7 +86,7 @@ await server.start();
 server.applyMiddleware({ app, path: "/graphql", cors: false });
 
 // ==================== START ====================
-const PORT = process.env.PORT || 4000;
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`GraphQL → ${process.env.BASE_URL || `http://localhost:${PORT}`}/graphql`);
