@@ -47,7 +47,6 @@ const resolvers = {
     },
 
     dashboardStats: async () => {
-      // After regenerating Prisma client, status filter works
       const totalProperties = await prisma.property.count();
       const totalUsers = await prisma.user.count();
       const availableProperties = await prisma.property.count({
@@ -141,12 +140,15 @@ const resolvers = {
       if (!property) throw new Error("Property not found");
       if (property.ownerId !== user.id && user.role !== "admin") throw new Error("Not authorized");
 
-      await prisma.property.update({ where: { id }, data: input });
+      // Update basic property fields (excluding gallery)
+      const { gallery, ...updateData } = input;
+      await prisma.property.update({ where: { id }, data: updateData });
 
-      if (input.gallery) {
-        await prisma.images.deleteMany({ where: { propertyId: id } });
-        await prisma.images.createMany({
-          data: input.gallery.map((img, index) => ({
+      // Update gallery images
+      if (gallery) {
+        await prisma.propertyImage.deleteMany({ where: { propertyId: id } });
+        await prisma.propertyImage.createMany({
+          data: gallery.map((img, index) => ({
             url: img.url,
             caption: img.caption,
             order: img.order || index,
@@ -269,6 +271,7 @@ const resolvers = {
     },
   },
 
+  // ✅ Property type resolvers - MAKE SURE THIS HAS COMMA AFTER Mutation
   Property: {
     gallery: (parent) => parent.images || [],
   },

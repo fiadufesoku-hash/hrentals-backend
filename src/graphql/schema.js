@@ -50,7 +50,7 @@ export const typeDefs = `
         imageUrl: String
         gallery: [PropertyImage!]!
         createdAt: String
-        user: User
+        owner: User
         company: Company
     }
 
