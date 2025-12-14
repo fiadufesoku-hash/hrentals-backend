@@ -168,18 +168,23 @@ properties: async (_, { type }, context) => {
         include: { owner: true, company: true, images: { orderBy: { order: "asc" } } },
       });
     },
+deleteProperty: async (_, { id }, { user }) => {
+  if (!user) throw new Error("Not authenticated");
 
-    deleteProperty: async (_, { id }, { user }) => {
-      if (!user) throw new Error("Not authenticated");
-      const property = await prisma.property.findUnique({ where: { id } });
-      if (!property) throw new Error("Property not found");
-      if (property.ownerId !== user.id && user.role !== "admin") throw new Error("Not authorized");
+  const property = await prisma.property.findUnique({ where: { id } });
+  if (!property) throw new Error("Property not found");
+  if (property.ownerId !== user.id && user.role !== "admin") throw new Error("Not authorized");
 
-      return prisma.property.delete({
-        where: { id },
-        include: { owner: true, company: true },
-      });
-    },
+  // Delete all gallery images first
+  await prisma.propertyImage.deleteMany({ where: { propertyId: id } });
+
+  // Then delete the property
+  return prisma.property.delete({
+    where: { id },
+    include: { owner: true, company: true },
+  });
+},
+
 
     createBooking: async (_, { propertyId, startDate, endDate, totalAmount }, { user }) => {
       if (!user) throw new Error("Not authenticated");
