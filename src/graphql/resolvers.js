@@ -23,22 +23,19 @@ const resolvers = {
       });
     },
 
-    properties: async (_, { type }) => {
-      // Add to your properties resolver
 properties: async (_, { type }, context) => {
-  console.log("GraphQL Query received:", context.body.query);
-  // ... rest of your code
-}
-      const where = type ? { type } : {};
-      return prisma.property.findMany({
-        where,
-        include: {
-          owner: true,
-          company: true,
-          images: { orderBy: { order: "asc" } },
-        },
-      });
+  console.log("GraphQL Query received:", context.body?.query);
+  const where = type ? { type } : {};
+  return prisma.property.findMany({
+    where,
+    include: {
+      owner: true,
+      company: true,
+      images: { orderBy: { order: "asc" } },
     },
+  });
+},
+
 
     property: async (_, { id }) => {
       return prisma.property.findUnique({

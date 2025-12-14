@@ -85,7 +85,7 @@ export const typeDefs = `
     input PropertyImageInput {
         url: String!
         caption: String
-        order: Int!
+        order: Int
     }
 
     input PropertyInput {
