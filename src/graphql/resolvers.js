@@ -127,13 +127,14 @@ properties: async (_, { type }, context) => {
           imageUrl: input.imageUrl,
           ownerId: user.id,
           companyId: defaultCompany.id,
-          images: {
-            create: input.gallery?.map((img, index) => ({
-              url: img.url,
-              caption: img.caption,
-              order: img.order || index,
-            })) || [],
-          },
+        images: {
+       create: input.gallery?.map((img, index) => ({
+    url: img.url.trim(),
+    caption: img.caption,
+    order: img.order || index,
+  })) || [],
+},
+
         },
         include: { owner: true, company: true, images: { orderBy: { order: "asc" } } },
       });
@@ -277,9 +278,14 @@ properties: async (_, { type }, context) => {
   },
 
   // ✅ Property type resolvers - MAKE SURE THIS HAS COMMA AFTER Mutation
-  Property: {
-    gallery: (parent) => parent.images || [],
-  },
+Property: {
+  gallery: (parent) =>
+    parent.images?.map(img => ({
+      ...img,
+      url: img.url.trim(), // <-- ADD THIS
+    })) || [],
+},
+
 };
 
 export default resolvers;
