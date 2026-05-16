@@ -277,6 +277,17 @@ deleteProperty: async (_, { id }, { user }) => {
         include: { company: true },
       });
     },
+    deleteUser: async (_, { id }, { user }) => {
+      if (!user || user.role !== "admin") throw new Error("Admin only");
+      return prisma.user.delete({ where: { id } });
+    },
+    updateUserRole: async (_, { id, role }, { user }) => {
+      if (!user || user.role !== "admin") throw new Error("Admin only");
+      return prisma.user.update({
+        where: { id },
+        data: { role },
+      });
+    },
   },
 
   // ✅ Property type resolvers - MAKE SURE THIS HAS COMMA AFTER Mutation

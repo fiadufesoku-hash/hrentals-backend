@@ -139,5 +139,7 @@ export const typeDefs = `
         createCompany(name: String!, logoUrl: String, contact: String!, momoAccount: String): Company!
         createPartner(input: PartnerInput!): AuthPayload!
         updatePropertyCompany(id: Int!, companyId: Int!): Property!
+        deleteUser(id: Int!): User!
+        updateUserRole(id: Int!, role: String!): User!
     }
 `;
