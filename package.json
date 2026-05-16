@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "build": "prisma generate",
+    "build": "prisma generate --schema=src/prisma/schema.prisma",
     "db:push": "prisma db push --schema=src/prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema=src/prisma/schema.prisma",
     "railway": "npm run prisma:generate && npm run start",
