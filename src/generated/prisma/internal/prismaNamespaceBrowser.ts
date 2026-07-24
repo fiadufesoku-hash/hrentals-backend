@@ -55,7 +55,8 @@ export const ModelName = {
   Company: 'Company',
   Property: 'Property',
   PropertyImage: 'PropertyImage',
-  Booking: 'Booking'
+  Booking: 'Booking',
+  Report: 'Report'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -81,6 +82,8 @@ export const UserScalarFieldEnum = {
   password: 'password',
   role: 'role',
   phone: 'phone',
+  resetOtpCode: 'resetOtpCode',
+  resetOtpExpires: 'resetOtpExpires',
   companyId: 'companyId',
   createdAt: 'createdAt'
 } as const
@@ -111,6 +114,7 @@ export const PropertyScalarFieldEnum = {
   status: 'status',
   type: 'type',
   contact: 'contact',
+  isFeatured: 'isFeatured',
   ownerId: 'ownerId',
   companyId: 'companyId',
   createdAt: 'createdAt'
@@ -146,6 +150,19 @@ export const BookingScalarFieldEnum = {
 } as const
 
 export type BookingScalarFieldEnum = (typeof BookingScalarFieldEnum)[keyof typeof BookingScalarFieldEnum]
+
+
+export const ReportScalarFieldEnum = {
+  id: 'id',
+  propertyId: 'propertyId',
+  reason: 'reason',
+  details: 'details',
+  reporterId: 'reporterId',
+  status: 'status',
+  createdAt: 'createdAt'
+} as const
+
+export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -66,3 +66,8 @@ export type PropertyImage = Prisma.PropertyImageModel
  * 
  */
 export type Booking = Prisma.BookingModel
+/**
+ * Model Report
+ * 
+ */
+export type Report = Prisma.ReportModel

@@ -155,12 +155,20 @@ export const typeDefs = `
         reports: [Report!]!
     }
 
+    type PasswordResetPayload {
+        success: Boolean!
+        message: String!
+        otpCode: String
+    }
+
     ##########################
     # MUTATIONS
     ##########################
     type Mutation {
         register(input: RegisterInput!): AuthPayload!
         login(email: String!, password: String!): AuthPayload!
+        requestPasswordReset(identifier: String!): PasswordResetPayload!
+        resetPasswordWithOtp(identifier: String!, otpCode: String!, newPassword: String!): PasswordResetPayload!
         addProperty(input: PropertyInput!): Property!
         updateProperty(id: Int!, input: PropertyInput!): Property!
         updatePropertyStatus(id: Int!, status: String!): Property!

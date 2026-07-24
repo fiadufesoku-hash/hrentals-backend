@@ -43,6 +43,8 @@ export type UserMinAggregateOutputType = {
   password: string | null
   role: string | null
   phone: string | null
+  resetOtpCode: string | null
+  resetOtpExpires: Date | null
   companyId: number | null
   createdAt: Date | null
 }
@@ -54,6 +56,8 @@ export type UserMaxAggregateOutputType = {
   password: string | null
   role: string | null
   phone: string | null
+  resetOtpCode: string | null
+  resetOtpExpires: Date | null
   companyId: number | null
   createdAt: Date | null
 }
@@ -65,6 +69,8 @@ export type UserCountAggregateOutputType = {
   password: number
   role: number
   phone: number
+  resetOtpCode: number
+  resetOtpExpires: number
   companyId: number
   createdAt: number
   _all: number
@@ -88,6 +94,8 @@ export type UserMinAggregateInputType = {
   password?: true
   role?: true
   phone?: true
+  resetOtpCode?: true
+  resetOtpExpires?: true
   companyId?: true
   createdAt?: true
 }
@@ -99,6 +107,8 @@ export type UserMaxAggregateInputType = {
   password?: true
   role?: true
   phone?: true
+  resetOtpCode?: true
+  resetOtpExpires?: true
   companyId?: true
   createdAt?: true
 }
@@ -110,6 +120,8 @@ export type UserCountAggregateInputType = {
   password?: true
   role?: true
   phone?: true
+  resetOtpCode?: true
+  resetOtpExpires?: true
   companyId?: true
   createdAt?: true
   _all?: true
@@ -208,6 +220,8 @@ export type UserGroupByOutputType = {
   password: string
   role: string
   phone: string | null
+  resetOtpCode: string | null
+  resetOtpExpires: Date | null
   companyId: number | null
   createdAt: Date
   _count: UserCountAggregateOutputType | null
@@ -242,10 +256,13 @@ export type UserWhereInput = {
   password?: Prisma.StringFilter<"User"> | string
   role?: Prisma.StringFilter<"User"> | string
   phone?: Prisma.StringNullableFilter<"User"> | string | null
+  resetOtpCode?: Prisma.StringNullableFilter<"User"> | string | null
+  resetOtpExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   companyId?: Prisma.IntNullableFilter<"User"> | number | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   bookings?: Prisma.BookingListRelationFilter
   properties?: Prisma.PropertyListRelationFilter
+  reports?: Prisma.ReportListRelationFilter
   company?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
 }
 
@@ -256,10 +273,13 @@ export type UserOrderByWithRelationInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetOtpCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetOtpExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   companyId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   bookings?: Prisma.BookingOrderByRelationAggregateInput
   properties?: Prisma.PropertyOrderByRelationAggregateInput
+  reports?: Prisma.ReportOrderByRelationAggregateInput
   company?: Prisma.CompanyOrderByWithRelationInput
 }
 
@@ -273,10 +293,13 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   password?: Prisma.StringFilter<"User"> | string
   role?: Prisma.StringFilter<"User"> | string
   phone?: Prisma.StringNullableFilter<"User"> | string | null
+  resetOtpCode?: Prisma.StringNullableFilter<"User"> | string | null
+  resetOtpExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   companyId?: Prisma.IntNullableFilter<"User"> | number | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   bookings?: Prisma.BookingListRelationFilter
   properties?: Prisma.PropertyListRelationFilter
+  reports?: Prisma.ReportListRelationFilter
   company?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
 }, "id" | "email">
 
@@ -287,6 +310,8 @@ export type UserOrderByWithAggregationInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetOtpCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetOtpExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   companyId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -306,6 +331,8 @@ export type UserScalarWhereWithAggregatesInput = {
   password?: Prisma.StringWithAggregatesFilter<"User"> | string
   role?: Prisma.StringWithAggregatesFilter<"User"> | string
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  resetOtpCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  resetOtpExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   companyId?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -316,9 +343,12 @@ export type UserCreateInput = {
   password: string
   role?: string
   phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   properties?: Prisma.PropertyCreateNestedManyWithoutOwnerInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
   company?: Prisma.CompanyCreateNestedOneWithoutUsersInput
 }
 
@@ -329,10 +359,13 @@ export type UserUncheckedCreateInput = {
   password: string
   role?: string
   phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
   companyId?: number | null
   createdAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   properties?: Prisma.PropertyUncheckedCreateNestedManyWithoutOwnerInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserUpdateInput = {
@@ -341,9 +374,12 @@ export type UserUpdateInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUpdateManyWithoutOwnerNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   company?: Prisma.CompanyUpdateOneWithoutUsersNestedInput
 }
 
@@ -354,10 +390,13 @@ export type UserUncheckedUpdateInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   companyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUncheckedUpdateManyWithoutOwnerNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -367,6 +406,8 @@ export type UserCreateManyInput = {
   password: string
   role?: string
   phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
   companyId?: number | null
   createdAt?: Date | string
 }
@@ -377,6 +418,8 @@ export type UserUpdateManyMutationInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -387,6 +430,8 @@ export type UserUncheckedUpdateManyInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   companyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -398,6 +443,8 @@ export type UserCountOrderByAggregateInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  resetOtpCode?: Prisma.SortOrder
+  resetOtpExpires?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -414,6 +461,8 @@ export type UserMaxOrderByAggregateInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  resetOtpCode?: Prisma.SortOrder
+  resetOtpExpires?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -425,6 +474,8 @@ export type UserMinOrderByAggregateInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  resetOtpCode?: Prisma.SortOrder
+  resetOtpExpires?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -449,12 +500,21 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -547,15 +607,34 @@ export type UserUpdateOneRequiredWithoutBookingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBookingsInput, Prisma.UserUpdateWithoutBookingsInput>, Prisma.UserUncheckedUpdateWithoutBookingsInput>
 }
 
+export type UserCreateNestedOneWithoutReportsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReportsInput, Prisma.UserUncheckedCreateWithoutReportsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReportsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutReportsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReportsInput, Prisma.UserUncheckedCreateWithoutReportsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReportsInput
+  upsert?: Prisma.UserUpsertWithoutReportsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReportsInput, Prisma.UserUpdateWithoutReportsInput>, Prisma.UserUncheckedUpdateWithoutReportsInput>
+}
+
 export type UserCreateWithoutCompanyInput = {
   name: string
   email: string
   password: string
   role?: string
   phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   properties?: Prisma.PropertyCreateNestedManyWithoutOwnerInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
 }
 
 export type UserUncheckedCreateWithoutCompanyInput = {
@@ -565,9 +644,12 @@ export type UserUncheckedCreateWithoutCompanyInput = {
   password: string
   role?: string
   phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   properties?: Prisma.PropertyUncheckedCreateNestedManyWithoutOwnerInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserCreateOrConnectWithoutCompanyInput = {
@@ -606,6 +688,8 @@ export type UserScalarWhereInput = {
   password?: Prisma.StringFilter<"User"> | string
   role?: Prisma.StringFilter<"User"> | string
   phone?: Prisma.StringNullableFilter<"User"> | string | null
+  resetOtpCode?: Prisma.StringNullableFilter<"User"> | string | null
+  resetOtpExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   companyId?: Prisma.IntNullableFilter<"User"> | number | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
 }
@@ -616,8 +700,11 @@ export type UserCreateWithoutPropertiesInput = {
   password: string
   role?: string
   phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
   company?: Prisma.CompanyCreateNestedOneWithoutUsersInput
 }
 
@@ -628,9 +715,12 @@ export type UserUncheckedCreateWithoutPropertiesInput = {
   password: string
   role?: string
   phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
   companyId?: number | null
   createdAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserCreateOrConnectWithoutPropertiesInput = {
@@ -655,8 +745,11 @@ export type UserUpdateWithoutPropertiesInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   company?: Prisma.CompanyUpdateOneWithoutUsersNestedInput
 }
 
@@ -667,9 +760,12 @@ export type UserUncheckedUpdateWithoutPropertiesInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   companyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserCreateWithoutBookingsInput = {
@@ -678,8 +774,11 @@ export type UserCreateWithoutBookingsInput = {
   password: string
   role?: string
   phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
   createdAt?: Date | string
   properties?: Prisma.PropertyCreateNestedManyWithoutOwnerInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
   company?: Prisma.CompanyCreateNestedOneWithoutUsersInput
 }
 
@@ -690,9 +789,12 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   password: string
   role?: string
   phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
   companyId?: number | null
   createdAt?: Date | string
   properties?: Prisma.PropertyUncheckedCreateNestedManyWithoutOwnerInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
 }
 
 export type UserCreateOrConnectWithoutBookingsInput = {
@@ -717,8 +819,11 @@ export type UserUpdateWithoutBookingsInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   properties?: Prisma.PropertyUpdateManyWithoutOwnerNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
   company?: Prisma.CompanyUpdateOneWithoutUsersNestedInput
 }
 
@@ -729,8 +834,85 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   companyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  properties?: Prisma.PropertyUncheckedUpdateManyWithoutOwnerNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+}
+
+export type UserCreateWithoutReportsInput = {
+  name: string
+  email: string
+  password: string
+  role?: string
+  phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
+  createdAt?: Date | string
+  bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
+  properties?: Prisma.PropertyCreateNestedManyWithoutOwnerInput
+  company?: Prisma.CompanyCreateNestedOneWithoutUsersInput
+}
+
+export type UserUncheckedCreateWithoutReportsInput = {
+  id?: number
+  name: string
+  email: string
+  password: string
+  role?: string
+  phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
+  companyId?: number | null
+  createdAt?: Date | string
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
+  properties?: Prisma.PropertyUncheckedCreateNestedManyWithoutOwnerInput
+}
+
+export type UserCreateOrConnectWithoutReportsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReportsInput, Prisma.UserUncheckedCreateWithoutReportsInput>
+}
+
+export type UserUpsertWithoutReportsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReportsInput, Prisma.UserUncheckedUpdateWithoutReportsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReportsInput, Prisma.UserUncheckedCreateWithoutReportsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReportsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReportsInput, Prisma.UserUncheckedUpdateWithoutReportsInput>
+}
+
+export type UserUpdateWithoutReportsInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
+  properties?: Prisma.PropertyUpdateManyWithoutOwnerNestedInput
+  company?: Prisma.CompanyUpdateOneWithoutUsersNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReportsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  companyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
@@ -741,6 +923,8 @@ export type UserCreateManyCompanyInput = {
   password: string
   role?: string
   phone?: string | null
+  resetOtpCode?: string | null
+  resetOtpExpires?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -750,9 +934,12 @@ export type UserUpdateWithoutCompanyInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUpdateManyWithoutOwnerNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCompanyInput = {
@@ -762,9 +949,12 @@ export type UserUncheckedUpdateWithoutCompanyInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUncheckedUpdateManyWithoutOwnerNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutCompanyInput = {
@@ -774,6 +964,8 @@ export type UserUncheckedUpdateManyWithoutCompanyInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -785,11 +977,13 @@ export type UserUncheckedUpdateManyWithoutCompanyInput = {
 export type UserCountOutputType = {
   bookings: number
   properties: number
+  reports: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bookings?: boolean | UserCountOutputTypeCountBookingsArgs
   properties?: boolean | UserCountOutputTypeCountPropertiesArgs
+  reports?: boolean | UserCountOutputTypeCountReportsArgs
 }
 
 /**
@@ -816,6 +1010,13 @@ export type UserCountOutputTypeCountPropertiesArgs<ExtArgs extends runtime.Types
   where?: Prisma.PropertyWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReportWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -824,10 +1025,13 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   password?: boolean
   role?: boolean
   phone?: boolean
+  resetOtpCode?: boolean
+  resetOtpExpires?: boolean
   companyId?: boolean
   createdAt?: boolean
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
   properties?: boolean | Prisma.User$propertiesArgs<ExtArgs>
+  reports?: boolean | Prisma.User$reportsArgs<ExtArgs>
   company?: boolean | Prisma.User$companyArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -839,6 +1043,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   password?: boolean
   role?: boolean
   phone?: boolean
+  resetOtpCode?: boolean
+  resetOtpExpires?: boolean
   companyId?: boolean
   createdAt?: boolean
   company?: boolean | Prisma.User$companyArgs<ExtArgs>
@@ -851,6 +1057,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   password?: boolean
   role?: boolean
   phone?: boolean
+  resetOtpCode?: boolean
+  resetOtpExpires?: boolean
   companyId?: boolean
   createdAt?: boolean
   company?: boolean | Prisma.User$companyArgs<ExtArgs>
@@ -863,14 +1071,17 @@ export type UserSelectScalar = {
   password?: boolean
   role?: boolean
   phone?: boolean
+  resetOtpCode?: boolean
+  resetOtpExpires?: boolean
   companyId?: boolean
   createdAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "phone" | "companyId" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "phone" | "resetOtpCode" | "resetOtpExpires" | "companyId" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
   properties?: boolean | Prisma.User$propertiesArgs<ExtArgs>
+  reports?: boolean | Prisma.User$reportsArgs<ExtArgs>
   company?: boolean | Prisma.User$companyArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -886,6 +1097,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     bookings: Prisma.$BookingPayload<ExtArgs>[]
     properties: Prisma.$PropertyPayload<ExtArgs>[]
+    reports: Prisma.$ReportPayload<ExtArgs>[]
     company: Prisma.$CompanyPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -895,6 +1107,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     password: string
     role: string
     phone: string | null
+    resetOtpCode: string | null
+    resetOtpExpires: Date | null
     companyId: number | null
     createdAt: Date
   }, ExtArgs["result"]["user"]>
@@ -1293,6 +1507,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   bookings<T extends Prisma.User$bookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   properties<T extends Prisma.User$propertiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$propertiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PropertyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reports<T extends Prisma.User$reportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   company<T extends Prisma.User$companyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$companyArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1329,6 +1544,8 @@ export interface UserFieldRefs {
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'String'>
   readonly phone: Prisma.FieldRef<"User", 'String'>
+  readonly resetOtpCode: Prisma.FieldRef<"User", 'String'>
+  readonly resetOtpExpires: Prisma.FieldRef<"User", 'DateTime'>
   readonly companyId: Prisma.FieldRef<"User", 'Int'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -1777,6 +1994,30 @@ export type User$propertiesArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.PropertyScalarFieldEnum | Prisma.PropertyScalarFieldEnum[]
+}
+
+/**
+ * User.reports
+ */
+export type User$reportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Report
+   */
+  select?: Prisma.ReportSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Report
+   */
+  omit?: Prisma.ReportOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReportInclude<ExtArgs> | null
+  where?: Prisma.ReportWhereInput
+  orderBy?: Prisma.ReportOrderByWithRelationInput | Prisma.ReportOrderByWithRelationInput[]
+  cursor?: Prisma.ReportWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReportScalarFieldEnum | Prisma.ReportScalarFieldEnum[]
 }
 
 /**
