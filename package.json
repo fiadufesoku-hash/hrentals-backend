@@ -4,17 +4,18 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "build": "prisma generate --schema=src/prisma/schema.prisma",
-    "db:push": "prisma db push --schema=src/prisma/schema.prisma",
-    "prisma:generate": "prisma generate --schema=src/prisma/schema.prisma",
+    "dev": "nodemon --exec node --experimental-strip-types src/server.js",
+    "start": "node --experimental-strip-types src/server.js",
+    "build": "prisma generate",
+    "db:push": "prisma db push",
+    "prisma:generate": "prisma generate",
     "railway": "npm run prisma:generate && npm run start",
     "postinstall": "npm run prisma:generate"
   },
   "dependencies": {
     "@fluidjs/multer-cloudinary": "^1.0.4",
-    "@prisma/client": "^5.19.1",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "apollo-server-express": "^3.13.0",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
@@ -26,11 +27,12 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.15.3",
+    "pg": "^8.22.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10",
-    "prisma": "^5.19.1"
+    "prisma": "^7.8.0"
   },
   "engines": {
     "node": ">=18.0.0"

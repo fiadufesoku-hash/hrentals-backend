@@ -40,10 +40,10 @@ try {
 }
 
 // ==================== SERVER SETUP ====================
-// CORS – allow Flutter Web from anywhere
+// CORS – allow Web client requests
 app.use(
   cors({
-    origin: "*",
+    origin: true,
     credentials: true,
   })
 );
@@ -323,15 +323,20 @@ await server.start();
 server.applyMiddleware({ app, path: "/graphql", cors: false });
 
 // ==================== SERVER START ====================
-app.listen(PORT, "0.0.0.0", () => {
-  console.log('\n🚀 SERVER STARTED ===========');
-  console.log(`Port: ${PORT}`);
-  console.log(`GraphQL: ${process.env.BASE_URL || `http://localhost:${PORT}`}/graphql`);
-  console.log(`Health: ${process.env.BASE_URL || `http://localhost:${PORT}`}/health`);
-  console.log(`Cloudinary Test: ${process.env.BASE_URL || `http://localhost:${PORT}`}/api/debug-cloudinary`);
-  console.log(`Upload Config: ${process.env.BASE_URL || `http://localhost:${PORT}`}/api/debug-upload-config`);
-  console.log(`Test Upload: ${process.env.BASE_URL || `http://localhost:${PORT}`}/api/test-upload`);
-  console.log(`USE_RAILWAY: ${process.env.USE_RAILWAY}`);
-  console.log(`Upload Service: ${process.env.USE_RAILWAY === "true" ? "☁️ Cloudinary" : "💾 Local Storage"}`);
-  console.log('======================================\n');
-});
+// Vercel serverless environment doesn't require app.listen()
+if (!process.env.VERCEL) {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log('\n🚀 SERVER STARTED ===========');
+    console.log(`Port: ${PORT}`);
+    console.log(`GraphQL: ${process.env.BASE_URL || `http://localhost:${PORT}`}/graphql`);
+    console.log(`Health: ${process.env.BASE_URL || `http://localhost:${PORT}`}/health`);
+    console.log(`Cloudinary Test: ${process.env.BASE_URL || `http://localhost:${PORT}`}/api/debug-cloudinary`);
+    console.log(`Upload Config: ${process.env.BASE_URL || `http://localhost:${PORT}`}/api/debug-upload-config`);
+    console.log(`Test Upload: ${process.env.BASE_URL || `http://localhost:${PORT}`}/api/test-upload`);
+    console.log(`USE_RAILWAY: ${process.env.USE_RAILWAY}`);
+    console.log(`Upload Service: ${process.env.USE_RAILWAY === "true" ? "☁️ Cloudinary" : "💾 Local Storage"}`);
+    console.log('======================================\n');
+  });
+}
+
+export default app;

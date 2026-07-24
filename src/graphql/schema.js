@@ -1,10 +1,10 @@
 export const typeDefs = `
     scalar DateTime
-    scalar Upload
 
     ##########################
     # OBJECT TYPES
     ##########################
+
     type PropertyImage {
         id: Int!
         url: String!
@@ -23,11 +23,14 @@ export const typeDefs = `
         properties: [Property!]!
     }
 
+    """Statistics returned for the admin dashboard."""
     type DashboardStats {
         totalProperties: Int!
         totalUsers: Int!
         availableProperties: Int!
         rentedProperties: Int!
+        totalPageVisits: Int!
+        todayPageVisits: Int!
     }
 
     type User {
@@ -48,10 +51,32 @@ export const typeDefs = `
         type: String
         status: String
         imageUrl: String
+        isFeatured: Boolean!
         gallery: [PropertyImage!]!
         createdAt: String
         owner: User
         company: Company
+    }
+
+    type Report {
+        id: Int!
+        propertyId: Int!
+        reason: String!
+        details: String
+        status: String!
+        createdAt: String!
+        property: Property
+        reporter: User
+    }
+
+    type ContactLog {
+        id: Int!
+        customerName: String!
+        customerPhone: String!
+        actionType: String!
+        landlordPhone: String!
+        createdAt: String!
+        property: Property
     }
 
     type Booking {
@@ -75,6 +100,7 @@ export const typeDefs = `
     ##########################
     # INPUT TYPES
     ##########################
+
     input RegisterInput {
         name: String!
         email: String!
@@ -97,6 +123,7 @@ export const typeDefs = `
         type: String
         status: String
         imageUrl: String
+        isFeatured: Boolean
         gallery: [PropertyImageInput!]
     }
 
@@ -124,6 +151,8 @@ export const typeDefs = `
         companies: [Company!]!
         company(id: Int!): Company
         dashboardStats: DashboardStats!
+        contactLogs: [ContactLog!]!
+        reports: [Report!]!
     }
 
     ##########################
@@ -134,6 +163,8 @@ export const typeDefs = `
         login(email: String!, password: String!): AuthPayload!
         addProperty(input: PropertyInput!): Property!
         updateProperty(id: Int!, input: PropertyInput!): Property!
+        updatePropertyStatus(id: Int!, status: String!): Property!
+        togglePropertyFeatured(id: Int!): Property!
         deleteProperty(id: Int!): Property!
         createBooking(propertyId: Int!, startDate: DateTime!, endDate: DateTime!, totalAmount: Float!): Booking!
         createCompany(name: String!, logoUrl: String, contact: String!, momoAccount: String): Company!
@@ -141,5 +172,11 @@ export const typeDefs = `
         updatePropertyCompany(id: Int!, companyId: Int!): Property!
         deleteUser(id: Int!): User!
         updateUserRole(id: Int!, role: String!): User!
+        createContactLog(customerName: String!, customerPhone: String!, actionType: String!, propertyId: Int!, landlordPhone: String!): ContactLog!
+        createReport(propertyId: Int!, reason: String!, details: String): Report!
+        updateReportStatus(id: Int!, status: String!): Report!
+        deleteReport(id: Int!): Report!
+        recordPageVisit(path: String!): Boolean!
     }
 `;
+

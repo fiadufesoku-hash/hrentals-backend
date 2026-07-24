@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
 model User {
@@ -19,6 +19,7 @@ model User {
 
   bookings   Booking[]
   properties Property[]
+  reports    Report[]
   company    Company?   @relation(fields: [companyId], references: [id])
 }
 
@@ -46,6 +47,7 @@ model Property {
   status      String   @default("available")
   type        String?
   contact     String?
+  isFeatured  Boolean  @default(false)
   ownerId     Int
   companyId   Int
   createdAt   DateTime @default(now())
@@ -54,6 +56,7 @@ model Property {
   company  Company         @relation(fields: [companyId], references: [id])
   bookings Booking[]
   images   PropertyImage[]
+  reports  Report[]
 }
 
 model PropertyImage {
@@ -84,3 +87,17 @@ model Booking {
   property Property @relation(fields: [propertyId], references: [id])
   company  Company  @relation(fields: [companyId], references: [id])
 }
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  propertyId Int
+  reason     String
+  details    String?
+  reporterId Int?
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  reporter User?    @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+}
+
