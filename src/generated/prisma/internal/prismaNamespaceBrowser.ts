@@ -56,7 +56,8 @@ export const ModelName = {
   Property: 'Property',
   PropertyImage: 'PropertyImage',
   Booking: 'Booking',
-  Report: 'Report'
+  Report: 'Report',
+  LandlordRegistration: 'LandlordRegistration'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -114,6 +115,7 @@ export const PropertyScalarFieldEnum = {
   status: 'status',
   type: 'type',
   contact: 'contact',
+  landlordName: 'landlordName',
   isFeatured: 'isFeatured',
   ownerId: 'ownerId',
   companyId: 'companyId',
@@ -163,6 +165,40 @@ export const ReportScalarFieldEnum = {
 } as const
 
 export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
+
+
+export const LandlordRegistrationScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  dob: 'dob',
+  gender: 'gender',
+  nationalId: 'nationalId',
+  homeAddress: 'homeAddress',
+  city: 'city',
+  region: 'region',
+  phone1: 'phone1',
+  phone2: 'phone2',
+  email: 'email',
+  occupation: 'occupation',
+  propAddress: 'propAddress',
+  propCity: 'propCity',
+  propLandmark: 'propLandmark',
+  propRegion: 'propRegion',
+  propGps: 'propGps',
+  rent: 'rent',
+  advance: 'advance',
+  rooms: 'rooms',
+  availableFrom: 'availableFrom',
+  propType: 'propType',
+  amenities: 'amenities',
+  plan: 'plan',
+  photos: 'photos',
+  status: 'status',
+  agreementSigned: 'agreementSigned',
+  createdAt: 'createdAt'
+} as const
+
+export type LandlordRegistrationScalarFieldEnum = (typeof LandlordRegistrationScalarFieldEnum)[keyof typeof LandlordRegistrationScalarFieldEnum]
 
 
 export const SortOrder = {

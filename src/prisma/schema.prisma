@@ -49,6 +49,7 @@ model Property {
   status      String   @default("available")
   type        String?
   contact     String?
+  landlordName String?
   isFeatured  Boolean  @default(false)
   ownerId     Int
   companyId   Int
@@ -102,4 +103,36 @@ model Report {
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   reporter User?    @relation(fields: [reporterId], references: [id], onDelete: SetNull)
 }
+
+model LandlordRegistration {
+  id              Int      @id @default(autoincrement())
+  name            String
+  dob             String?
+  gender          String?
+  nationalId      String?
+  homeAddress     String?
+  city            String
+  region          String?
+  phone1          String
+  phone2          String?
+  email           String?
+  occupation      String?
+  propAddress     String
+  propCity        String?
+  propLandmark    String?
+  propRegion      String?
+  propGps         String?
+  rent            Float
+  advance         String?
+  rooms           Int?
+  availableFrom   String?
+  propType        String?
+  amenities       String[]
+  plan            String?
+  photos          String[]
+  status          String   @default("Pending Verification")
+  agreementSigned Boolean  @default(true)
+  createdAt       DateTime @default(now())
+}
+
 

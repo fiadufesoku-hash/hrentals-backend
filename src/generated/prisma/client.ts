@@ -71,3 +71,8 @@ export type Booking = Prisma.BookingModel
  * 
  */
 export type Report = Prisma.ReportModel
+/**
+ * Model LandlordRegistration
+ * 
+ */
+export type LandlordRegistration = Prisma.LandlordRegistrationModel

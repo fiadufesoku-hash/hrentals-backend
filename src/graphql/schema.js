@@ -48,6 +48,7 @@ export const typeDefs = `
         price: Float!
         description: String
         contact: String
+        landlordName: String
         type: String
         status: String
         imageUrl: String
@@ -120,6 +121,7 @@ export const typeDefs = `
         price: Float!
         description: String
         contact: String
+        landlordName: String
         type: String
         status: String
         imageUrl: String
@@ -139,6 +141,64 @@ export const typeDefs = `
         momoAccount: String
     }
 
+    type LandlordRegistration {
+        id: ID!
+        name: String!
+        dob: String
+        gender: String
+        nationalId: String
+        homeAddress: String
+        city: String!
+        region: String
+        phone1: String!
+        phone2: String
+        email: String
+        occupation: String
+        propAddress: String!
+        propCity: String
+        propLandmark: String
+        propRegion: String
+        propGps: String
+        rent: Float!
+        advance: String
+        rooms: Int
+        availableFrom: String
+        propType: String
+        amenities: [String!]!
+        plan: String
+        photos: [String!]!
+        status: String!
+        agreementSigned: Boolean!
+        createdAt: String!
+    }
+
+    input LandlordRegistrationInput {
+        name: String!
+        dob: String
+        gender: String
+        nationalId: String
+        homeAddress: String
+        city: String!
+        region: String
+        phone1: String!
+        phone2: String
+        email: String
+        occupation: String
+        propAddress: String!
+        propCity: String
+        propLandmark: String
+        propRegion: String
+        propGps: String
+        rent: Float!
+        advance: String
+        rooms: Int
+        availableFrom: String
+        propType: String
+        amenities: [String!]!
+        plan: String
+        photos: [String!]!
+    }
+
     ##########################
     # QUERIES
     ##########################
@@ -153,6 +213,7 @@ export const typeDefs = `
         dashboardStats: DashboardStats!
         contactLogs: [ContactLog!]!
         reports: [Report!]!
+        landlordRegistrations: [LandlordRegistration!]!
     }
 
     type PasswordResetPayload {
@@ -185,6 +246,10 @@ export const typeDefs = `
         updateReportStatus(id: Int!, status: String!): Report!
         deleteReport(id: Int!): Report!
         recordPageVisit(path: String!): Boolean!
+        createLandlordRegistration(input: LandlordRegistrationInput!): LandlordRegistration!
+        updateLandlordRegistrationStatus(id: Int!, status: String!): LandlordRegistration!
+        deleteLandlordRegistration(id: Int!): LandlordRegistration!
+        publishLandlordRegistration(id: Int!): Property!
     }
 `;
 

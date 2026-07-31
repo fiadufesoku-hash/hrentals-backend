@@ -389,7 +389,8 @@ export const ModelName = {
   Property: 'Property',
   PropertyImage: 'PropertyImage',
   Booking: 'Booking',
-  Report: 'Report'
+  Report: 'Report',
+  LandlordRegistration: 'LandlordRegistration'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -405,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "company" | "property" | "propertyImage" | "booking" | "report"
+    modelProps: "user" | "company" | "property" | "propertyImage" | "booking" | "report" | "landlordRegistration"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -853,6 +854,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LandlordRegistration: {
+      payload: Prisma.$LandlordRegistrationPayload<ExtArgs>
+      fields: Prisma.LandlordRegistrationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LandlordRegistrationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LandlordRegistrationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload>
+        }
+        findFirst: {
+          args: Prisma.LandlordRegistrationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LandlordRegistrationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload>
+        }
+        findMany: {
+          args: Prisma.LandlordRegistrationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload>[]
+        }
+        create: {
+          args: Prisma.LandlordRegistrationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload>
+        }
+        createMany: {
+          args: Prisma.LandlordRegistrationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LandlordRegistrationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload>[]
+        }
+        delete: {
+          args: Prisma.LandlordRegistrationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload>
+        }
+        update: {
+          args: Prisma.LandlordRegistrationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload>
+        }
+        deleteMany: {
+          args: Prisma.LandlordRegistrationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LandlordRegistrationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LandlordRegistrationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload>[]
+        }
+        upsert: {
+          args: Prisma.LandlordRegistrationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LandlordRegistrationPayload>
+        }
+        aggregate: {
+          args: Prisma.LandlordRegistrationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLandlordRegistration>
+        }
+        groupBy: {
+          args: Prisma.LandlordRegistrationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LandlordRegistrationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LandlordRegistrationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LandlordRegistrationCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -931,6 +1006,7 @@ export const PropertyScalarFieldEnum = {
   status: 'status',
   type: 'type',
   contact: 'contact',
+  landlordName: 'landlordName',
   isFeatured: 'isFeatured',
   ownerId: 'ownerId',
   companyId: 'companyId',
@@ -980,6 +1056,40 @@ export const ReportScalarFieldEnum = {
 } as const
 
 export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
+
+
+export const LandlordRegistrationScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  dob: 'dob',
+  gender: 'gender',
+  nationalId: 'nationalId',
+  homeAddress: 'homeAddress',
+  city: 'city',
+  region: 'region',
+  phone1: 'phone1',
+  phone2: 'phone2',
+  email: 'email',
+  occupation: 'occupation',
+  propAddress: 'propAddress',
+  propCity: 'propCity',
+  propLandmark: 'propLandmark',
+  propRegion: 'propRegion',
+  propGps: 'propGps',
+  rent: 'rent',
+  advance: 'advance',
+  rooms: 'rooms',
+  availableFrom: 'availableFrom',
+  propType: 'propType',
+  amenities: 'amenities',
+  plan: 'plan',
+  photos: 'photos',
+  status: 'status',
+  agreementSigned: 'agreementSigned',
+  createdAt: 'createdAt'
+} as const
+
+export type LandlordRegistrationScalarFieldEnum = (typeof LandlordRegistrationScalarFieldEnum)[keyof typeof LandlordRegistrationScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1190,6 +1300,7 @@ export type GlobalOmitConfig = {
   propertyImage?: Prisma.PropertyImageOmit
   booking?: Prisma.BookingOmit
   report?: Prisma.ReportOmit
+  landlordRegistration?: Prisma.LandlordRegistrationOmit
 }
 
 /* Types for Logging */
