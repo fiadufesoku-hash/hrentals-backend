@@ -17,6 +17,8 @@ model User {
   resetOtpCode     String?
   resetOtpExpires  DateTime?
   companyId        Int?
+  failedLoginAttempts Int       @default(0)
+  lockoutUntil        DateTime?
   createdAt DateTime @default(now())
 
   bookings   Booking[]

@@ -8,6 +8,8 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
 
+import rateLimit from "express-rate-limit";
+
 import { typeDefs } from "./graphql/schema.js";
 import resolvers from "./graphql/resolvers.js";
 import { handleCollectionCallback } from "./services/momoService.js";
@@ -19,6 +21,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 4000;
 const app = express();
+
+// ==================== RATE LIMITING ====================
+const graphqlLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes window
+  max: 100, // Limit each IP to 100 requests per 15 minutes window on /graphql
+  message: { error: "Too many requests from this IP, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/graphql", graphqlLimiter);
 
 // ==================== CLOUDINARY DEBUG INIT ====================
 console.log('\n🔧 CLOUDINARY CONFIGURATION DEBUG ===========');

@@ -86,6 +86,8 @@ export const UserScalarFieldEnum = {
   resetOtpCode: 'resetOtpCode',
   resetOtpExpires: 'resetOtpExpires',
   companyId: 'companyId',
+  failedLoginAttempts: 'failedLoginAttempts',
+  lockoutUntil: 'lockoutUntil',
   createdAt: 'createdAt'
 } as const
 

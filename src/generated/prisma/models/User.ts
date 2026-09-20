@@ -29,11 +29,13 @@ export type AggregateUser = {
 export type UserAvgAggregateOutputType = {
   id: number | null
   companyId: number | null
+  failedLoginAttempts: number | null
 }
 
 export type UserSumAggregateOutputType = {
   id: number | null
   companyId: number | null
+  failedLoginAttempts: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -46,6 +48,8 @@ export type UserMinAggregateOutputType = {
   resetOtpCode: string | null
   resetOtpExpires: Date | null
   companyId: number | null
+  failedLoginAttempts: number | null
+  lockoutUntil: Date | null
   createdAt: Date | null
 }
 
@@ -59,6 +63,8 @@ export type UserMaxAggregateOutputType = {
   resetOtpCode: string | null
   resetOtpExpires: Date | null
   companyId: number | null
+  failedLoginAttempts: number | null
+  lockoutUntil: Date | null
   createdAt: Date | null
 }
 
@@ -72,6 +78,8 @@ export type UserCountAggregateOutputType = {
   resetOtpCode: number
   resetOtpExpires: number
   companyId: number
+  failedLoginAttempts: number
+  lockoutUntil: number
   createdAt: number
   _all: number
 }
@@ -80,11 +88,13 @@ export type UserCountAggregateOutputType = {
 export type UserAvgAggregateInputType = {
   id?: true
   companyId?: true
+  failedLoginAttempts?: true
 }
 
 export type UserSumAggregateInputType = {
   id?: true
   companyId?: true
+  failedLoginAttempts?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -97,6 +107,8 @@ export type UserMinAggregateInputType = {
   resetOtpCode?: true
   resetOtpExpires?: true
   companyId?: true
+  failedLoginAttempts?: true
+  lockoutUntil?: true
   createdAt?: true
 }
 
@@ -110,6 +122,8 @@ export type UserMaxAggregateInputType = {
   resetOtpCode?: true
   resetOtpExpires?: true
   companyId?: true
+  failedLoginAttempts?: true
+  lockoutUntil?: true
   createdAt?: true
 }
 
@@ -123,6 +137,8 @@ export type UserCountAggregateInputType = {
   resetOtpCode?: true
   resetOtpExpires?: true
   companyId?: true
+  failedLoginAttempts?: true
+  lockoutUntil?: true
   createdAt?: true
   _all?: true
 }
@@ -223,6 +239,8 @@ export type UserGroupByOutputType = {
   resetOtpCode: string | null
   resetOtpExpires: Date | null
   companyId: number | null
+  failedLoginAttempts: number
+  lockoutUntil: Date | null
   createdAt: Date
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
@@ -259,6 +277,8 @@ export type UserWhereInput = {
   resetOtpCode?: Prisma.StringNullableFilter<"User"> | string | null
   resetOtpExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   companyId?: Prisma.IntNullableFilter<"User"> | number | null
+  failedLoginAttempts?: Prisma.IntFilter<"User"> | number
+  lockoutUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   bookings?: Prisma.BookingListRelationFilter
   properties?: Prisma.PropertyListRelationFilter
@@ -276,6 +296,8 @@ export type UserOrderByWithRelationInput = {
   resetOtpCode?: Prisma.SortOrderInput | Prisma.SortOrder
   resetOtpExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   companyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
+  lockoutUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   bookings?: Prisma.BookingOrderByRelationAggregateInput
   properties?: Prisma.PropertyOrderByRelationAggregateInput
@@ -296,6 +318,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   resetOtpCode?: Prisma.StringNullableFilter<"User"> | string | null
   resetOtpExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   companyId?: Prisma.IntNullableFilter<"User"> | number | null
+  failedLoginAttempts?: Prisma.IntFilter<"User"> | number
+  lockoutUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   bookings?: Prisma.BookingListRelationFilter
   properties?: Prisma.PropertyListRelationFilter
@@ -313,6 +337,8 @@ export type UserOrderByWithAggregationInput = {
   resetOtpCode?: Prisma.SortOrderInput | Prisma.SortOrder
   resetOtpExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   companyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
+  lockoutUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
@@ -334,6 +360,8 @@ export type UserScalarWhereWithAggregatesInput = {
   resetOtpCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   resetOtpExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   companyId?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
+  failedLoginAttempts?: Prisma.IntWithAggregatesFilter<"User"> | number
+  lockoutUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
 
@@ -345,6 +373,8 @@ export type UserCreateInput = {
   phone?: string | null
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   properties?: Prisma.PropertyCreateNestedManyWithoutOwnerInput
@@ -362,6 +392,8 @@ export type UserUncheckedCreateInput = {
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
   companyId?: number | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   properties?: Prisma.PropertyUncheckedCreateNestedManyWithoutOwnerInput
@@ -376,6 +408,8 @@ export type UserUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUpdateManyWithoutOwnerNestedInput
@@ -393,6 +427,8 @@ export type UserUncheckedUpdateInput = {
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   companyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -409,6 +445,8 @@ export type UserCreateManyInput = {
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
   companyId?: number | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -420,6 +458,8 @@ export type UserUpdateManyMutationInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -433,6 +473,8 @@ export type UserUncheckedUpdateManyInput = {
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   companyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -446,12 +488,15 @@ export type UserCountOrderByAggregateInput = {
   resetOtpCode?: Prisma.SortOrder
   resetOtpExpires?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
+  lockoutUntil?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -464,6 +509,8 @@ export type UserMaxOrderByAggregateInput = {
   resetOtpCode?: Prisma.SortOrder
   resetOtpExpires?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
+  lockoutUntil?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -477,12 +524,15 @@ export type UserMinOrderByAggregateInput = {
   resetOtpCode?: Prisma.SortOrder
   resetOtpExpires?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
+  lockoutUntil?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
 }
 
 export type UserListRelationFilter = {
@@ -517,16 +567,16 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type IntFieldUpdateOperationsInput = {
   set?: number
   increment?: number
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type DateTimeFieldUpdateOperationsInput = {
+  set?: Date | string
 }
 
 export type NullableIntFieldUpdateOperationsInput = {
@@ -631,6 +681,8 @@ export type UserCreateWithoutCompanyInput = {
   phone?: string | null
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   properties?: Prisma.PropertyCreateNestedManyWithoutOwnerInput
@@ -646,6 +698,8 @@ export type UserUncheckedCreateWithoutCompanyInput = {
   phone?: string | null
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   properties?: Prisma.PropertyUncheckedCreateNestedManyWithoutOwnerInput
@@ -691,6 +745,8 @@ export type UserScalarWhereInput = {
   resetOtpCode?: Prisma.StringNullableFilter<"User"> | string | null
   resetOtpExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   companyId?: Prisma.IntNullableFilter<"User"> | number | null
+  failedLoginAttempts?: Prisma.IntFilter<"User"> | number
+  lockoutUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
 }
 
@@ -702,6 +758,8 @@ export type UserCreateWithoutPropertiesInput = {
   phone?: string | null
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -718,6 +776,8 @@ export type UserUncheckedCreateWithoutPropertiesInput = {
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
   companyId?: number | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -747,6 +807,8 @@ export type UserUpdateWithoutPropertiesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -763,6 +825,8 @@ export type UserUncheckedUpdateWithoutPropertiesInput = {
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   companyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -776,6 +840,8 @@ export type UserCreateWithoutBookingsInput = {
   phone?: string | null
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
   properties?: Prisma.PropertyCreateNestedManyWithoutOwnerInput
   reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
@@ -792,6 +858,8 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
   companyId?: number | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
   properties?: Prisma.PropertyUncheckedCreateNestedManyWithoutOwnerInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -821,6 +889,8 @@ export type UserUpdateWithoutBookingsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   properties?: Prisma.PropertyUpdateManyWithoutOwnerNestedInput
   reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
@@ -837,6 +907,8 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   companyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   properties?: Prisma.PropertyUncheckedUpdateManyWithoutOwnerNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -850,6 +922,8 @@ export type UserCreateWithoutReportsInput = {
   phone?: string | null
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   properties?: Prisma.PropertyCreateNestedManyWithoutOwnerInput
@@ -866,6 +940,8 @@ export type UserUncheckedCreateWithoutReportsInput = {
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
   companyId?: number | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   properties?: Prisma.PropertyUncheckedCreateNestedManyWithoutOwnerInput
@@ -895,6 +971,8 @@ export type UserUpdateWithoutReportsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUpdateManyWithoutOwnerNestedInput
@@ -911,6 +989,8 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   companyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -925,6 +1005,8 @@ export type UserCreateManyCompanyInput = {
   phone?: string | null
   resetOtpCode?: string | null
   resetOtpExpires?: Date | string | null
+  failedLoginAttempts?: number
+  lockoutUntil?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -936,6 +1018,8 @@ export type UserUpdateWithoutCompanyInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUpdateManyWithoutOwnerNestedInput
@@ -951,6 +1035,8 @@ export type UserUncheckedUpdateWithoutCompanyInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   properties?: Prisma.PropertyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -966,6 +1052,8 @@ export type UserUncheckedUpdateManyWithoutCompanyInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resetOtpExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1028,6 +1116,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   resetOtpCode?: boolean
   resetOtpExpires?: boolean
   companyId?: boolean
+  failedLoginAttempts?: boolean
+  lockoutUntil?: boolean
   createdAt?: boolean
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
   properties?: boolean | Prisma.User$propertiesArgs<ExtArgs>
@@ -1046,6 +1136,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   resetOtpCode?: boolean
   resetOtpExpires?: boolean
   companyId?: boolean
+  failedLoginAttempts?: boolean
+  lockoutUntil?: boolean
   createdAt?: boolean
   company?: boolean | Prisma.User$companyArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1060,6 +1152,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   resetOtpCode?: boolean
   resetOtpExpires?: boolean
   companyId?: boolean
+  failedLoginAttempts?: boolean
+  lockoutUntil?: boolean
   createdAt?: boolean
   company?: boolean | Prisma.User$companyArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1074,10 +1168,12 @@ export type UserSelectScalar = {
   resetOtpCode?: boolean
   resetOtpExpires?: boolean
   companyId?: boolean
+  failedLoginAttempts?: boolean
+  lockoutUntil?: boolean
   createdAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "phone" | "resetOtpCode" | "resetOtpExpires" | "companyId" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "phone" | "resetOtpCode" | "resetOtpExpires" | "companyId" | "failedLoginAttempts" | "lockoutUntil" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
   properties?: boolean | Prisma.User$propertiesArgs<ExtArgs>
@@ -1110,6 +1206,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     resetOtpCode: string | null
     resetOtpExpires: Date | null
     companyId: number | null
+    failedLoginAttempts: number
+    lockoutUntil: Date | null
     createdAt: Date
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -1547,6 +1645,8 @@ export interface UserFieldRefs {
   readonly resetOtpCode: Prisma.FieldRef<"User", 'String'>
   readonly resetOtpExpires: Prisma.FieldRef<"User", 'DateTime'>
   readonly companyId: Prisma.FieldRef<"User", 'Int'>
+  readonly failedLoginAttempts: Prisma.FieldRef<"User", 'Int'>
+  readonly lockoutUntil: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     

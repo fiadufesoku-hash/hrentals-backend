@@ -199,10 +199,50 @@ const resolvers = {
 
     login: async (_, { email, password }) => {
       const user = await prisma.user.findUnique({ where: { email } });
-      // Use constant-time comparison message to avoid user enumeration
+      // Generic response message to avoid account enumeration
       if (!user) throw new Error("Invalid email or password.");
+
+      // Check if account is currently locked out
+      if (user.lockoutUntil && new Date(user.lockoutUntil) > new Date()) {
+        const remainingMinutes = Math.ceil((new Date(user.lockoutUntil).getTime() - Date.now()) / (60 * 1000));
+        throw new Error(
+          `Account locked due to too many failed login attempts. Please try again in ${remainingMinutes} minute${remainingMinutes > 1 ? "s" : ""}.`
+        );
+      }
+
       const valid = await bcrypt.compare(password, user.password);
-      if (!valid) throw new Error("Invalid email or password.");
+
+      if (!valid) {
+        const newFailedAttempts = (user.failedLoginAttempts || 0) + 1;
+        const updates = { failedLoginAttempts: newFailedAttempts };
+
+        // Lock account for 15 minutes after 5 failed attempts
+        if (newFailedAttempts >= 5) {
+          updates.lockoutUntil = new Date(Date.now() + 15 * 60 * 1000);
+        }
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: updates,
+        });
+
+        if (newFailedAttempts >= 5) {
+          throw new Error("Too many failed login attempts. Your account has been temporarily locked for 15 minutes.");
+        }
+
+        throw new Error("Invalid email or password.");
+      }
+
+      // Successful login - reset failed attempts and clear lockout
+      if (user.failedLoginAttempts > 0 || user.lockoutUntil !== null) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            failedLoginAttempts: 0,
+            lockoutUntil: null,
+          },
+        });
+      }
 
       return { token: signToken(user.id), user };
     },
